@@ -24,20 +24,23 @@ services:
         value: "20"
       - key: NODE_ENV
         value: production
-      # ── à renseigner dans le dashboard Render (onglet Environment) ──
-      - key: DATABASE_URL # Supabase → Connection Pooling (port 6543, ?pgbouncer=true)
-        sync: false
-      - key: DIRECT_URL # Supabase → connexion directe (port 5432) — pour prisma db push
-        sync: false
+      # Valeurs publiques (projet Supabase gestion-rucher-2) — pré-remplies.
       - key: SUPABASE_URL
+        value: https://qqnzsttvgbasukbfcgzq.supabase.co
+      - key: SUPABASE_JWT_JWKS_URL
+        value: https://qqnzsttvgbasukbfcgzq.supabase.co/auth/v1/.well-known/jwks.json
+      # ── SECRETS : à coller dans le dashboard Render (onglet Environment) ──
+      # DATABASE_URL  = pooler transaction, port 6543 :
+      #   postgresql://postgres.qqnzsttvgbasukbfcgzq:<MDP>@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+      - key: DATABASE_URL
         sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
+      # DIRECT_URL    = pooler session, port 5432 :
+      #   postgresql://postgres.qqnzsttvgbasukbfcgzq:<MDP>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
+      - key: DIRECT_URL
         sync: false
-      - key: SUPABASE_JWT_JWKS_URL # projets récents (clés asymétriques)
+      - key: SUPABASE_SERVICE_ROLE_KEY # Project Settings → API → service_role (Reveal)
         sync: false
-      - key: SUPABASE_JWT_SECRET # OU projets legacy (secret HS256) — l'un des deux
-        sync: false
-      - key: GEMINI_API_KEY
+      - key: GEMINI_API_KEY # clé Google AI Studio
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.6-flash
