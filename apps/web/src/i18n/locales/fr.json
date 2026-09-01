@@ -1,0 +1,332 @@
+{
+  "app": { "name": "MOUMEN Apiary AI", "tagline": "Le copilote intelligent de l'apiculteur" },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "apiaries": "Ruchers",
+    "hives": "Ruches",
+    "inspections": "Inspections",
+    "calendar": "Calendrier",
+    "tasks": "Travaux",
+    "queens": "Reines",
+    "treatments": "Traitements",
+    "harvests": "Récoltes",
+    "finance": "Finance",
+    "analytics": "Statistiques",
+    "moumen": "MOUMEN AI",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "home": "Accueil",
+    "menu": "Menu"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "retry": "Réessayer",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "offline": "Mode hors connexion — vos données sont enregistrées localement.",
+    "syncing": "Synchronisation… ({{count}} en attente)",
+    "comingSoon": "Bientôt disponible",
+    "comingSoonBody": "Ce module est planifié dans la feuille de route. Voir docs/ARCHITECTURE.html."
+  },
+  "dashboard": {
+    "greeting": "Bonjour 👋",
+    "activeHives": "Ruches actives",
+    "alerts": "Alertes",
+    "inspectionsToday": "Inspections",
+    "tasks": "Tâches",
+    "insightsTitle": "MOUMEN AI Insights",
+    "insightsEmpty": "Aucune alerte — tout va bien.",
+    "upcomingTasks": "Tâches à venir",
+    "talkToMoumen": "Parler à MOUMEN"
+  },
+  "auth": {
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "signOut": "Déconnexion",
+    "sendMagicLink": "Recevoir un lien de connexion",
+    "useMagicLink": "Utiliser un lien par e-mail",
+    "usePassword": "Utiliser un mot de passe",
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "checkEmail": "Vérifiez votre boîte e-mail.",
+    "notConfigured": "Authentification non configurée (VITE_SUPABASE_URL manquant).",
+    "devLogin": "Connexion développeur (local)"
+  },
+  "analytics": {
+    "hives": "Ruches",
+    "activity": "Activité",
+    "inspections30": "Inspections (30 j)",
+    "inspections7": "Inspections (7 j)"
+  },
+  "apiaries": {
+    "new": "Nouveau rucher",
+    "edit": "Modifier",
+    "empty": "Aucun rucher. Créez-en un pour commencer.",
+    "name": "Nom",
+    "location": "Lieu",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "notes": "Notes",
+    "delete": "Supprimer le rucher",
+    "deleteConfirm": "Supprimer « {{name}} » ? Les ruches ne sont pas supprimées et restent consultables dans leur historique.",
+    "deleteBlocked": "Retirez ou déplacez d'abord les ruches de ce rucher."
+  },
+  "hives": {
+    "title": "Ruches",
+    "empty": "Aucune ruche pour l'instant.",
+    "new": "Nouvelle ruche",
+    "edit": "Modifier",
+    "number": "N°",
+    "name": "Nom",
+    "status": "Statut",
+    "strength": "Force",
+    "origin": "Origine",
+    "hiveType": "Type de ruche",
+    "strain": "Souche",
+    "currentQueen": "Reine en place",
+    "noQueen": "— Aucune reine",
+    "needApiary": "Créez d'abord un rucher pour y ajouter des ruches.",
+    "lastInspection": "Dernière inspection",
+    "never": "jamais",
+    "filterWeak": "Faibles",
+    "filterAll": "Toutes",
+    "emptyArchived": "Aucune ruche archivée.",
+    "allApiaries": "Tous les ruchers",
+    "filter": { "active": "Actives", "weak": "Faibles", "archived": "Archivées" }
+  },
+  "hiveStatus": {
+    "active": "Active",
+    "strong": "Forte",
+    "medium": "Moyenne",
+    "weak": "Faible",
+    "very_weak": "Très faible",
+    "dead": "Morte",
+    "sold": "Vendue",
+    "merged": "Fusionnée",
+    "archived": "Archivée"
+  },
+  "hiveDetail": {
+    "askMoumen": "Demander à MOUMEN",
+    "startInspection": "Commencer l'inspection",
+    "nextInspection": "Prochaine inspection",
+    "queen": "Reine",
+    "inspections": "Inspections",
+    "noInspections": "Aucune inspection enregistrée.",
+    "archive": "Archiver",
+    "unarchive": "Désarchiver",
+    "archiveHint": "La ruche passe en statut « archivée ». Son historique est conservé et rien n'est supprimé.",
+    "archiveReason": "Motif de l'archivage (vendue, fusionnée, morte…)"
+  },
+  "smart": {
+    "title": "Inspection guidée",
+    "back": "Retour",
+    "next": "Suivant",
+    "review": "Récapitulatif",
+    "reviewTitle": "Vérifiez avant d'enregistrer",
+    "addPhoto": "Ajouter une photo",
+    "photos": "Photos",
+    "aiNotes": "Observations IA",
+    "disclaimer": "Les observations IA sont des indices à vérifier, pas un diagnostic.",
+    "step": {
+      "entrance": { "title": "L'entrée de la ruche", "hint": "Montrez l'activité sur la planche d'envol." },
+      "frame": { "title": "Un cadre", "hint": "Sortez et photographiez un cadre." },
+      "brood": { "title": "La zone de couvain", "hint": "Montrez le couvain ouvert et operculé." },
+      "queen": { "title": "La reine", "hint": "Cherchez la reine si elle est visible." },
+      "stores": { "title": "Les réserves", "hint": "Montrez le miel et le pollen stockés." }
+    }
+  },
+  "queens": {
+    "old": "Anciennes",
+    "years": "ans",
+    "unknownStrain": "Reine",
+    "unknownYear": "année inconnue"
+  },
+  "queenStatus": {
+    "active": "En place",
+    "replaced": "Remplacée",
+    "dead": "Morte",
+    "removed": "Retirée"
+  },
+  "queenQuality": {
+    "excellent": "Excellente",
+    "good": "Bonne",
+    "fair": "Correcte",
+    "poor": "Faible"
+  },
+  "treatments": { "ongoing": "en cours" },
+  "treatmentTarget": { "varroa": "Varroa", "nosema": "Nosema", "other": "Autre" },
+  "tasks": {
+    "newPlaceholder": "Nouvelle tâche…",
+    "empty": "Aucune tâche.",
+    "done": "Marquer comme fait",
+    "scope": { "overdue": "En retard", "today": "Aujourd'hui", "week": "Semaine", "all": "Toutes" }
+  },
+  "taskPriority": { "low": "Basse", "normal": "Normale", "high": "Haute", "urgent": "Urgente" },
+  "taskType": {
+    "inspection": "Inspection",
+    "split": "Division",
+    "feeding": "Nourrissement",
+    "add_frame": "Ajout de cadre",
+    "treatment": "Traitement",
+    "queen_check": "Contrôle de reine",
+    "queen_replace": "Remplacement de reine",
+    "harvest": "Récolte",
+    "transfer": "Transfert",
+    "merge": "Fusion",
+    "seasonal_prep": "Préparation saisonnière",
+    "custom": "Tâche"
+  },
+  "calendar": {
+    "organise": "Organiser ma semaine",
+    "createTask": "Créer la tâche",
+    "noDate": "Sans échéance"
+  },
+  "inspection": {
+    "quickTitle": "Inspection rapide",
+    "queenSeen": "Reine vue",
+    "honey": "Réserves de miel",
+    "notes": "Observations…",
+    "saved": "Inspection enregistrée.",
+    "savedOffline": "Enregistrée hors connexion — synchro à la reconnexion."
+  },
+  "strength": {
+    "very_strong": "Très forte",
+    "strong": "Forte",
+    "medium": "Moyenne",
+    "weak": "Faible",
+    "very_weak": "Très faible"
+  },
+  "level": { "none": "Nulles", "low": "Faibles", "medium": "Moyennes", "high": "Bonnes" },
+  "finance": {
+    "week": "Semaine",
+    "month": "Mois",
+    "year": "Année",
+    "revenue": "Revenus",
+    "expense": "Dépenses",
+    "profit": "Bénéfice",
+    "byCategory": "Dépenses par catégorie"
+  },
+  "expenseCategory": {
+    "feed": "Nourrissement",
+    "treatment": "Traitements",
+    "equipment": "Matériel",
+    "hardware": "Quincaillerie",
+    "transport": "Transport",
+    "packaging": "Conditionnement",
+    "rent": "Location",
+    "labor": "Main-d'œuvre",
+    "other": "Autre"
+  },
+  "harvests": {
+    "total": "Production totale",
+    "avgPerHive": "Moyenne / ruche",
+    "count": "Récoltes",
+    "bestHive": "Meilleure ruche",
+    "recent": "Récoltes récentes"
+  },
+  "photo": {
+    "label": "Photo",
+    "add": "Ajouter une photo",
+    "replace": "Remplacer",
+    "remove": "Retirer",
+    "failed": "Échec de l'envoi de la photo."
+  },
+  "settings": {
+    "profile": "Profil",
+    "displayName": "Nom affiché",
+    "language": "Langue",
+    "currency": "Devise",
+    "units": "Unités",
+    "weight": "Poids",
+    "temperature": "Température",
+    "weightUnit": { "kg": "Kilogrammes (kg)", "lb": "Livres (lb)" },
+    "tempUnit": { "c": "Celsius (°C)", "f": "Fahrenheit (°F)" },
+    "thresholds": "Seuils d'alerte",
+    "thresholdsHint": "Ces valeurs pilotent le calcul des alertes du tableau de bord.",
+    "threshold": {
+      "inspectionOverdueDays": "Inspection en retard (jours)",
+      "inspectionAttentionDays": "Passe en « attention » (jours)",
+      "neverInspectedDays": "Ruche jamais inspectée (jours)",
+      "queenOldYears": "Reine âgée (années)",
+      "urgentTaskWithinDays": "Tâche urgente imminente (jours)"
+    },
+    "saved": "Réglages enregistrés."
+  },
+  "reports": {
+    "intro": "Exportez vos données au format CSV. Laissez les dates vides pour tout inclure.",
+    "from": "Du",
+    "to": "Au",
+    "separator": "Séparateur",
+    "sepComma": "Virgule (,)",
+    "sepSemicolon": "Point-virgule (;) — Excel FR",
+    "download": "Télécharger",
+    "kind": {
+      "hives": "Ruches",
+      "inspections": "Inspections",
+      "harvests": "Récoltes",
+      "expenses": "Dépenses",
+      "revenues": "Revenus",
+      "tasks": "Travaux",
+      "treatments": "Traitements",
+      "queens": "Reines"
+    }
+  },
+  "moumen": {
+    "title": "MOUMEN Assistant",
+    "placeholder": "Écrivez à MOUMEN…",
+    "status": "État du service",
+    "notWired": "Posez une question à MOUMEN. Il consulte vos données réelles et demande confirmation avant toute action.",
+    "send": "Envoyer"
+  },
+  "voice": {
+    "start": "Parler",
+    "stop": "Arrêter",
+    "sensitive": "Action sensible — confirmer",
+    "state": {
+      "idle": "Voix prête",
+      "connecting": "Connexion…",
+      "listening": "Je vous écoute…",
+      "speaking": "MOUMEN parle…",
+      "error": "Erreur vocale"
+    },
+    "err": {
+      "micro": "Accès au micro refusé.",
+      "connexion": "Connexion vocale interrompue."
+    }
+  },
+  "vision": {
+    "title": "MOUMEN Vision",
+    "disclaimer": "L'analyse visuelle est une aide à l'observation, jamais un diagnostic.",
+    "openCamera": "Ouvrir la caméra",
+    "capture": "Prendre la photo",
+    "upload": "Importer une image",
+    "uploading": "Envoi de l'image…",
+    "analyzing": "Analyse en cours…",
+    "cameraDenied": "Accès à la caméra refusé.",
+    "resultTitle": "Analyse IA — à vérifier",
+    "observation": "Observation",
+    "confidence": "Confiance",
+    "interpretation": "Interprétation",
+    "toVerify": "À vérifier",
+    "recommendation": "Recommandation",
+    "humanCheck": "Une vérification humaine sur le terrain reste nécessaire."
+  },
+  "error": {
+    "unauthorized": "Session expirée. Veuillez vous reconnecter.",
+    "forbidden": "Vous n'avez pas accès à cette ressource.",
+    "not_found": "Ressource introuvable.",
+    "conflict": "Conflit de données.",
+    "apiary_has_hives": "Ce rucher contient encore des ruches. Déplacez-les ou archivez-les d'abord.",
+    "validation_failed": "Données invalides.",
+    "rate_limited": "Trop de requêtes, réessayez dans un instant.",
+    "ai_unavailable": "Le service IA est momentanément indisponible.",
+    "voice_not_ready": "Le service vocal est momentanément indisponible.",
+    "internal": "Une erreur est survenue."
+  }
+}

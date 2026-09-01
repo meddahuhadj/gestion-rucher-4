@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── design tokens (§19) ─────────────────────────────────────── */
+:root {
+  --c-ground: 247 244 237;
+  --c-surface: 255 255 255;
+  --c-surface-2: 251 248 241;
+  --c-border: 228 220 201;
+  --c-ink: 34 28 19;
+  --c-ink-soft: 75 66 50;
+  --c-muted: 124 114 99;
+  --c-honey: 176 116 20;
+  --c-honey-ink: 122 78 11;
+  --c-honey-wash: 244 231 207;
+  --c-propolis: 53 101 94;
+  --c-ok: 46 125 70;
+  --c-warn: 154 106 18;
+  --c-attn: 184 86 12;
+  --c-danger: 165 50 30;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-ground: 23 19 12;
+    --c-surface: 32 26 17;
+    --c-surface-2: 38 32 19;
+    --c-border: 54 45 28;
+    --c-ink: 240 233 217;
+    --c-ink-soft: 205 195 172;
+    --c-muted: 154 142 119;
+    --c-honey: 224 166 62;
+    --c-honey-ink: 240 198 116;
+    --c-honey-wash: 51 39 15;
+    --c-propolis: 123 184 173;
+    --c-ok: 108 192 134;
+    --c-warn: 217 171 84;
+    --c-attn: 224 138 76;
+    --c-danger: 224 130 114;
+  }
+}
+
+:root[data-theme="dark"] {
+  --c-ground: 23 19 12;
+  --c-surface: 32 26 17;
+  --c-surface-2: 38 32 19;
+  --c-border: 54 45 28;
+  --c-ink: 240 233 217;
+  --c-ink-soft: 205 195 172;
+  --c-muted: 154 142 119;
+  --c-honey: 224 166 62;
+  --c-honey-ink: 240 198 116;
+  --c-honey-wash: 51 39 15;
+  --c-propolis: 123 184 173;
+  --c-ok: 108 192 134;
+  --c-warn: 217 171 84;
+  --c-attn: 224 138 76;
+  --c-danger: 224 130 114;
+}
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-ground text-ink font-sans antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-honey;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-border bg-surface shadow-sm;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           text-sm font-semibold transition-colors disabled:opacity-50;
+  }
+  .btn-primary { @apply btn bg-honey text-white hover:bg-honey-ink; }
+  .btn-ghost   { @apply btn border border-border bg-surface text-ink-soft hover:border-honey; }
+  .label-mono  { @apply font-mono text-[0.7rem] uppercase tracking-widest text-muted; }
+  .input {
+    @apply w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm
+           focus-visible:border-honey;
+  }
+}

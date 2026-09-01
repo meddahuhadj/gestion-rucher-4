@@ -1,0 +1,55 @@
+# Render Blueprint — API MOUMEN Apiary AI (offre gratuite).
+# Déploiement : https://dashboard.render.com → New + → Blueprint → sélectionner ce repo.
+# La base de données reste Supabase Postgres (NE PAS utiliser le Postgres gratuit
+# de Render : il expire au bout de 90 jours). Voir DEPLOY.md.
+
+services:
+  - type: web
+    name: moumen-api
+    runtime: node
+    plan: free
+    region: frankfurt # au plus proche de l'Algérie parmi les régions Render
+    rootDir: .
+    # pnpm workspace : on installe depuis la racine puis on build uniquement l'API.
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @moumen/api exec prisma generate &&
+      pnpm --filter @moumen/api build
+    startCommand: pnpm --filter @moumen/api start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      # ── à renseigner dans le dashboard Render (onglet Environment) ──
+      - key: DATABASE_URL # Supabase → Connection Pooling (port 6543, ?pgbouncer=true)
+        sync: false
+      - key: DIRECT_URL # Supabase → connexion directe (port 5432) — pour prisma db push
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWT_JWKS_URL # projets récents (clés asymétriques)
+        sync: false
+      - key: SUPABASE_JWT_SECRET # OU projets legacy (secret HS256) — l'un des deux
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.6-flash
+      - key: GEMINI_LIVE_MODEL
+        value: gemini-2.5-flash-native-audio-preview-09-2025
+      # Origine(s) autorisée(s) — domaine Vercel du frontend (séparés par des virgules).
+      - key: CORS_ORIGINS
+        value: https://moumen-apiary.vercel.app
+      - key: RATE_LIMIT_AI_PER_MIN
+        value: "20"
+      - key: LOG_LEVEL
+        value: info
+      # Optionnel : co-propriété (IDs Supabase séparés par des virgules, Moumen en 1er).
+      - key: TEAM_MEMBER_IDS
+        sync: false

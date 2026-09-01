@@ -1,0 +1,332 @@
+{
+  "app": { "name": "مومن أباري AI", "tagline": "المساعد الذكي للنحّال" },
+  "nav": {
+    "dashboard": "لوحة القيادة",
+    "apiaries": "المناحل",
+    "hives": "الخلايا",
+    "inspections": "المعاينات",
+    "calendar": "التقويم",
+    "tasks": "الأعمال",
+    "queens": "الملكات",
+    "treatments": "العلاجات",
+    "harvests": "المحاصيل",
+    "finance": "المالية",
+    "analytics": "الإحصائيات",
+    "moumen": "مومن AI",
+    "reports": "التقارير",
+    "settings": "الإعدادات",
+    "home": "الرئيسية",
+    "menu": "القائمة"
+  },
+  "common": {
+    "loading": "جارٍ التحميل…",
+    "retry": "إعادة المحاولة",
+    "add": "إضافة",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "delete": "حذف",
+    "search": "بحث",
+    "offline": "وضع عدم الاتصال — بياناتك محفوظة محليًا.",
+    "syncing": "جارٍ المزامنة… ({{count}} قيد الانتظار)",
+    "comingSoon": "قريبًا",
+    "comingSoonBody": "هذه الوحدة ضمن خارطة الطريق. راجع docs/ARCHITECTURE.html."
+  },
+  "dashboard": {
+    "greeting": "مرحبًا 👋",
+    "activeHives": "الخلايا النشطة",
+    "alerts": "التنبيهات",
+    "inspectionsToday": "المعاينات",
+    "tasks": "المهام",
+    "insightsTitle": "رؤى مومن الذكية",
+    "insightsEmpty": "لا توجد تنبيهات — كل شيء على ما يرام.",
+    "upcomingTasks": "المهام القادمة",
+    "talkToMoumen": "تحدّث إلى مومن"
+  },
+  "auth": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج",
+    "sendMagicLink": "أرسل لي رابط الدخول",
+    "useMagicLink": "استخدم رابطًا عبر البريد",
+    "usePassword": "استخدم كلمة مرور",
+    "google": "المتابعة عبر Google",
+    "or": "أو",
+    "checkEmail": "تحقّق من بريدك الإلكتروني.",
+    "notConfigured": "المصادقة غير مُهيّأة (VITE_SUPABASE_URL مفقود).",
+    "devLogin": "دخول المطوّر (محلي)"
+  },
+  "analytics": {
+    "hives": "الخلايا",
+    "activity": "النشاط",
+    "inspections30": "المعاينات (30 يومًا)",
+    "inspections7": "المعاينات (7 أيام)"
+  },
+  "apiaries": {
+    "new": "منحل جديد",
+    "edit": "تعديل",
+    "empty": "لا توجد مناحل. أنشئ واحدًا للبدء.",
+    "name": "الاسم",
+    "location": "الموقع",
+    "lat": "خط العرض",
+    "lng": "خط الطول",
+    "notes": "ملاحظات",
+    "delete": "حذف المنحل",
+    "deleteConfirm": "حذف «{{name}}»؟ لن تُحذف الخلايا وتبقى متاحة في سجلّها.",
+    "deleteBlocked": "انقل خلايا هذا المنحل أو أزلها أولاً."
+  },
+  "hives": {
+    "title": "الخلايا",
+    "empty": "لا توجد خلايا بعد.",
+    "new": "خلية جديدة",
+    "edit": "تعديل",
+    "number": "رقم",
+    "name": "الاسم",
+    "status": "الحالة",
+    "strength": "القوة",
+    "origin": "الأصل",
+    "hiveType": "نوع الخلية",
+    "strain": "السلالة",
+    "currentQueen": "الملكة الحالية",
+    "noQueen": "— بلا ملكة",
+    "needApiary": "أنشئ منحلًا أولاً لإضافة خلايا إليه.",
+    "lastInspection": "آخر معاينة",
+    "never": "أبدًا",
+    "filterWeak": "الضعيفة",
+    "filterAll": "الكل",
+    "emptyArchived": "لا توجد خلايا مؤرشفة.",
+    "allApiaries": "كل المناحل",
+    "filter": { "active": "النشطة", "weak": "الضعيفة", "archived": "المؤرشفة" }
+  },
+  "hiveStatus": {
+    "active": "نشطة",
+    "strong": "قوية",
+    "medium": "متوسطة",
+    "weak": "ضعيفة",
+    "very_weak": "ضعيفة جدًا",
+    "dead": "نافقة",
+    "sold": "مُباعة",
+    "merged": "مدموجة",
+    "archived": "مؤرشفة"
+  },
+  "hiveDetail": {
+    "askMoumen": "اسأل مومن",
+    "startInspection": "بدء المعاينة",
+    "nextInspection": "المعاينة القادمة",
+    "queen": "الملكة",
+    "inspections": "المعاينات",
+    "noInspections": "لا توجد معاينات مسجّلة.",
+    "archive": "أرشفة",
+    "unarchive": "إلغاء الأرشفة",
+    "archiveHint": "تنتقل الخلية إلى حالة «مؤرشفة». يُحفظ سجلّها ولا يُحذف شيء.",
+    "archiveReason": "سبب الأرشفة (مُباعة، مدموجة، نافقة…)"
+  },
+  "smart": {
+    "title": "معاينة موجَّهة",
+    "back": "رجوع",
+    "next": "التالي",
+    "review": "مراجعة",
+    "reviewTitle": "تحقّق قبل الحفظ",
+    "addPhoto": "إضافة صورة",
+    "photos": "الصور",
+    "aiNotes": "ملاحظات الذكاء الاصطناعي",
+    "disclaimer": "ملاحظات الذكاء الاصطناعي مؤشرات للتحقق، وليست تشخيصًا.",
+    "step": {
+      "entrance": { "title": "مدخل الخلية", "hint": "أظهر النشاط على لوحة الطيران." },
+      "frame": { "title": "إطار", "hint": "اسحب إطارًا وصوّره." },
+      "brood": { "title": "منطقة الحضنة", "hint": "أظهر الحضنة المفتوحة والمغلقة." },
+      "queen": { "title": "الملكة", "hint": "ابحث عن الملكة إن كانت ظاهرة." },
+      "stores": { "title": "المخزون", "hint": "أظهر العسل وحبوب اللقاح المخزَّنة." }
+    }
+  },
+  "queens": {
+    "old": "القديمة",
+    "years": "سنة",
+    "unknownStrain": "ملكة",
+    "unknownYear": "سنة غير معروفة"
+  },
+  "queenStatus": {
+    "active": "قائمة",
+    "replaced": "مستبدَلة",
+    "dead": "نافقة",
+    "removed": "مُزالة"
+  },
+  "queenQuality": {
+    "excellent": "ممتازة",
+    "good": "جيدة",
+    "fair": "مقبولة",
+    "poor": "ضعيفة"
+  },
+  "treatments": { "ongoing": "جارٍ" },
+  "treatmentTarget": { "varroa": "الفاروا", "nosema": "النوزيما", "other": "أخرى" },
+  "tasks": {
+    "newPlaceholder": "مهمة جديدة…",
+    "empty": "لا توجد مهام.",
+    "done": "تحديد كمنجَز",
+    "scope": { "overdue": "متأخرة", "today": "اليوم", "week": "الأسبوع", "all": "الكل" }
+  },
+  "taskPriority": { "low": "منخفضة", "normal": "عادية", "high": "عالية", "urgent": "عاجلة" },
+  "taskType": {
+    "inspection": "معاينة",
+    "split": "تقسيم",
+    "feeding": "تغذية",
+    "add_frame": "إضافة إطار",
+    "treatment": "علاج",
+    "queen_check": "فحص الملكة",
+    "queen_replace": "استبدال الملكة",
+    "harvest": "حصاد",
+    "transfer": "نقل",
+    "merge": "دمج",
+    "seasonal_prep": "تحضير موسمي",
+    "custom": "مهمة"
+  },
+  "calendar": {
+    "organise": "نظّم أسبوعي",
+    "createTask": "إنشاء المهمة",
+    "noDate": "بدون موعد"
+  },
+  "inspection": {
+    "quickTitle": "معاينة سريعة",
+    "queenSeen": "شوهدت الملكة",
+    "honey": "مخزون العسل",
+    "notes": "ملاحظات…",
+    "saved": "تم حفظ المعاينة.",
+    "savedOffline": "حُفظت دون اتصال — ستتم المزامنة عند عودة الاتصال."
+  },
+  "strength": {
+    "very_strong": "قوية جدًا",
+    "strong": "قوية",
+    "medium": "متوسطة",
+    "weak": "ضعيفة",
+    "very_weak": "ضعيفة جدًا"
+  },
+  "level": { "none": "معدومة", "low": "قليلة", "medium": "متوسطة", "high": "جيدة" },
+  "finance": {
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "revenue": "الإيرادات",
+    "expense": "المصاريف",
+    "profit": "الربح",
+    "byCategory": "المصاريف حسب الفئة"
+  },
+  "expenseCategory": {
+    "feed": "التغذية",
+    "treatment": "العلاجات",
+    "equipment": "المعدات",
+    "hardware": "الأدوات",
+    "transport": "النقل",
+    "packaging": "التعبئة",
+    "rent": "الإيجار",
+    "labor": "اليد العاملة",
+    "other": "أخرى"
+  },
+  "harvests": {
+    "total": "الإنتاج الإجمالي",
+    "avgPerHive": "المتوسط لكل خلية",
+    "count": "المحاصيل",
+    "bestHive": "أفضل خلية",
+    "recent": "المحاصيل الأخيرة"
+  },
+  "photo": {
+    "label": "صورة",
+    "add": "إضافة صورة",
+    "replace": "استبدال",
+    "remove": "إزالة",
+    "failed": "فشل رفع الصورة."
+  },
+  "settings": {
+    "profile": "الملف الشخصي",
+    "displayName": "الاسم المعروض",
+    "language": "اللغة",
+    "currency": "العملة",
+    "units": "الوحدات",
+    "weight": "الوزن",
+    "temperature": "الحرارة",
+    "weightUnit": { "kg": "كيلوغرام (kg)", "lb": "رطل (lb)" },
+    "tempUnit": { "c": "مئوية (°C)", "f": "فهرنهايت (°F)" },
+    "thresholds": "عتبات التنبيه",
+    "thresholdsHint": "تتحكّم هذه القيم في طريقة حساب تنبيهات لوحة القيادة.",
+    "threshold": {
+      "inspectionOverdueDays": "تأخّر المعاينة (أيام)",
+      "inspectionAttentionDays": "يتحوّل إلى «انتباه» (أيام)",
+      "neverInspectedDays": "خلية لم تُعاين قط (أيام)",
+      "queenOldYears": "الملكة تُعدّ مسنّة (سنوات)",
+      "urgentTaskWithinDays": "مهمة عاجلة وشيكة (أيام)"
+    },
+    "saved": "تم حفظ الإعدادات."
+  },
+  "reports": {
+    "intro": "صدّر بياناتك بصيغة CSV. اترك التواريخ فارغة لتضمين كل شيء.",
+    "from": "من",
+    "to": "إلى",
+    "separator": "الفاصل",
+    "sepComma": "فاصلة (,)",
+    "sepSemicolon": "فاصلة منقوطة (;) — إكسل",
+    "download": "تنزيل",
+    "kind": {
+      "hives": "الخلايا",
+      "inspections": "المعاينات",
+      "harvests": "المحاصيل",
+      "expenses": "المصاريف",
+      "revenues": "الإيرادات",
+      "tasks": "الأعمال",
+      "treatments": "العلاجات",
+      "queens": "الملكات"
+    }
+  },
+  "moumen": {
+    "title": "مساعد مومن",
+    "placeholder": "اكتب إلى مومن…",
+    "status": "حالة الخدمة",
+    "notWired": "اطرح سؤالاً على مومن. يعتمد على بياناتك الحقيقية ويطلب التأكيد قبل أي إجراء.",
+    "send": "إرسال"
+  },
+  "voice": {
+    "start": "تحدّث",
+    "stop": "إيقاف",
+    "sensitive": "إجراء حسّاس — أكِّد",
+    "state": {
+      "idle": "الصوت جاهز",
+      "connecting": "جارٍ الاتصال…",
+      "listening": "أستمع إليك…",
+      "speaking": "مومن يتحدّث…",
+      "error": "خطأ صوتي"
+    },
+    "err": {
+      "micro": "تم رفض الوصول إلى الميكروفون.",
+      "connexion": "انقطع الاتصال الصوتي."
+    }
+  },
+  "vision": {
+    "title": "مومن للرؤية",
+    "disclaimer": "التحليل البصري وسيلة مساعدة للملاحظة، وليس تشخيصًا.",
+    "openCamera": "فتح الكاميرا",
+    "capture": "التقاط صورة",
+    "upload": "رفع صورة",
+    "uploading": "جارٍ رفع الصورة…",
+    "analyzing": "جارٍ التحليل…",
+    "cameraDenied": "تم رفض الوصول إلى الكاميرا.",
+    "resultTitle": "تحليل الذكاء الاصطناعي — للتحقق",
+    "observation": "الملاحظة",
+    "confidence": "درجة الثقة",
+    "interpretation": "التفسير",
+    "toVerify": "للتحقق",
+    "recommendation": "التوصية",
+    "humanCheck": "يبقى التحقق الميداني من قبل الإنسان ضروريًا."
+  },
+  "error": {
+    "unauthorized": "انتهت الجلسة. يرجى تسجيل الدخول من جديد.",
+    "forbidden": "لا تملك صلاحية الوصول إلى هذا المورد.",
+    "not_found": "المورد غير موجود.",
+    "conflict": "تعارض في البيانات.",
+    "apiary_has_hives": "لا يزال هذا المنحل يحتوي على خلايا. انقلها أو أرشفها أولاً.",
+    "validation_failed": "بيانات غير صالحة.",
+    "rate_limited": "طلبات كثيرة، حاول بعد قليل.",
+    "ai_unavailable": "خدمة الذكاء الاصطناعي غير متاحة مؤقتًا.",
+    "voice_not_ready": "خدمة الصوت غير متاحة مؤقتًا.",
+    "internal": "حدث خطأ ما."
+  }
+}

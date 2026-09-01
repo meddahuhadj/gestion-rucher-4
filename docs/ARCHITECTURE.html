@@ -1,0 +1,1510 @@
+<title>MOUMEN Apiary AI Architecture</title>
+<meta name="description" content="Blueprint technique complet de la plateforme MOUMEN Apiary AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground:      #f7f4ed;
+    --surface:     #ffffff;
+    --surface-2:   #fbf8f1;
+    --ink:         #221c13;
+    --ink-soft:    #4b4232;
+    --muted:       #7c7263;
+    --border:      #e4dcc9;
+    --border-firm: #d3c8ad;
+    --accent:      #b07414;
+    --accent-ink:  #7a4e0b;
+    --accent-wash: #f4e7cf;
+    --system:      #35655e;
+    --system-wash: #e0ece9;
+    --ok:      #2e7d46;
+    --warn:    #9a6a12;
+    --attn:    #b8560c;
+    --danger:  #a5321e;
+    --ok-wash:     #e5f0e6;
+    --warn-wash:   #f4ead2;
+    --attn-wash:   #f6e5d6;
+    --danger-wash: #f4e0da;
+    --shadow: 0 1px 2px rgba(34,28,19,.05), 0 8px 24px -12px rgba(34,28,19,.18);
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #17130c;
+      --surface:     #201a11;
+      --surface-2:   #262013;
+      --ink:         #f0e9d9;
+      --ink-soft:    #cdc3ac;
+      --muted:       #9a8e77;
+      --border:      #362d1c;
+      --border-firm: #473c26;
+      --accent:      #e0a63e;
+      --accent-ink:  #f0c674;
+      --accent-wash: #33270f;
+      --system:      #7bb8ad;
+      --system-wash: #1c2a28;
+      --ok:      #6cc086;
+      --warn:    #d9ab54;
+      --attn:    #e08a4c;
+      --danger:  #e08272;
+      --ok-wash:     #16241a;
+      --warn-wash:   #2c2410;
+      --attn-wash:   #2c1f12;
+      --danger-wash: #2c1712;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:      #17130c;
+    --surface:     #201a11;
+    --surface-2:   #262013;
+    --ink:         #f0e9d9;
+    --ink-soft:    #cdc3ac;
+    --muted:       #9a8e77;
+    --border:      #362d1c;
+    --border-firm: #473c26;
+    --accent:      #e0a63e;
+    --accent-ink:  #f0c674;
+    --accent-wash: #33270f;
+    --system:      #7bb8ad;
+    --system-wash: #1c2a28;
+    --ok:      #6cc086;
+    --warn:    #d9ab54;
+    --attn:    #e08a4c;
+    --danger:  #e08272;
+    --ok-wash:     #16241a;
+    --warn-wash:   #2c2410;
+    --attn-wash:   #2c1f12;
+    --danger-wash: #2c1712;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- header ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem clamp(1rem, 4vw, 2.5rem);
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: baseline; gap: .6rem; min-width: 0; }
+  .brand b {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+  }
+  .brand span {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .theme-toggle {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px solid var(--border-firm);
+    border-radius: 999px;
+    padding: .4rem .8rem;
+    cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- layout ---- */
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+  @media (min-width: 1000px) {
+    .shell { grid-template-columns: 250px minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); }
+  }
+
+  /* ---- toc ---- */
+  .toc { display: none; }
+  @media (min-width: 1000px) {
+    .toc {
+      display: block;
+      position: sticky; top: 64px;
+      align-self: start;
+      max-height: calc(100vh - 84px);
+      overflow-y: auto;
+      padding: 2rem 0 3rem;
+      font-size: .82rem;
+      line-height: 1.4;
+    }
+  }
+  .toc-part {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    margin: 1.4rem 0 .5rem;
+  }
+  .toc-part:first-child { margin-top: 0; }
+  .toc a {
+    display: block;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: .22rem 0 .22rem .7rem;
+    border-left: 2px solid var(--border);
+  }
+  .toc a:hover { color: var(--accent-ink); border-left-color: var(--border-firm); }
+  .toc a.active { color: var(--accent-ink); border-left-color: var(--accent); font-weight: 600; }
+  .toc a .n { font-family: var(--font-mono); color: var(--muted); margin-right: .4rem; }
+  .toc a.active .n { color: var(--accent); }
+
+  /* ---- content ---- */
+  main { padding: 2.5rem 0 6rem; min-width: 0; }
+  .content > * { max-width: 68ch; }
+  .content > .wide, .content > figure, .content > table, .content > .cards, .content > .callout { max-width: none; }
+
+  .hero { margin-bottom: 3.5rem; }
+  .hero .kicker {
+    font-family: var(--font-mono);
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .16em;
+    color: var(--accent-ink);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 6vw, 3.15rem);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    margin: .5rem 0 .6rem;
+  }
+  .hero p.lead { font-size: 1.12rem; color: var(--ink-soft); margin: 0; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    margin-top: 1.6rem;
+    font-family: var(--font-mono);
+    font-size: .74rem;
+  }
+  .meta-row span {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: .3rem .6rem;
+    color: var(--ink-soft);
+  }
+  .meta-row span b { color: var(--accent-ink); font-weight: 600; }
+
+  .part-head {
+    margin: 4.5rem 0 0;
+    padding-top: 1.4rem;
+    border-top: 2px solid var(--border-firm);
+  }
+  .part-head .lbl {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: var(--accent-ink);
+  }
+  .part-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    letter-spacing: -.01em;
+    margin: .3rem 0 0;
+  }
+
+  section.doc { margin-top: 3rem; scroll-margin-top: 76px; }
+  section.doc > h3 {
+    display: flex; align-items: baseline; gap: .8rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+    margin: 0 0 .3rem;
+  }
+  section.doc > h3 .snum {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: .95rem;
+    color: var(--accent);
+    background: var(--accent-wash);
+    border-radius: 6px;
+    padding: .12rem .5rem;
+    align-self: center;
+    flex: none;
+  }
+  h4 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: .01em;
+    margin: 1.8rem 0 .5rem;
+    color: var(--ink);
+  }
+  h4::before { content: "▸ "; color: var(--accent); }
+
+  p { margin: .9rem 0; }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  ul, ol { margin: .9rem 0; padding-left: 1.3rem; }
+  li { margin: .35rem 0; }
+  li::marker { color: var(--muted); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: .86em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: .08em .35em;
+  }
+
+  figure { margin: 1.6rem 0; }
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: .5rem;
+  }
+  pre.diagram, pre.code {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--border-firm);
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow);
+  }
+  pre.code .c { color: var(--muted); }
+  pre.code .k { color: var(--accent-ink); }
+  pre.code .s { color: var(--system); }
+
+  .table-wrap { overflow-x: auto; margin: 1.4rem 0; border: 1px solid var(--border-firm); border-radius: 10px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: .84rem; background: var(--surface); }
+  th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    background: var(--surface-2);
+    position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { background: transparent; border: none; padding: 0; color: var(--accent-ink); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .callout {
+    margin: 1.5rem 0;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-firm);
+    border-left: 4px solid var(--accent);
+    background: var(--surface);
+  }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .tag {
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 500;
+  }
+  .callout.rule    { border-left-color: var(--accent); }
+  .callout.rule .tag { color: var(--accent-ink); }
+  .callout.danger  { border-left-color: var(--danger); background: var(--danger-wash); }
+  .callout.danger .tag { color: var(--danger); }
+  .callout.ok      { border-left-color: var(--ok); background: var(--ok-wash); }
+  .callout.ok .tag { color: var(--ok); }
+  .callout.system  { border-left-color: var(--system); background: var(--system-wash); }
+  .callout.system .tag { color: var(--system); }
+
+  .cards { display: grid; gap: 1rem; margin: 1.5rem 0; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-firm);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    box-shadow: var(--shadow);
+  }
+  .card h5 {
+    margin: 0 0 .3rem;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+  .card p { margin: 0; font-size: .9rem; }
+  .card .big {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--ink);
+    display: block;
+    margin-bottom: .2rem;
+  }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .04em;
+    padding: .1rem .45rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .pill.l1 { color: var(--ok); }
+  .pill.l2 { color: var(--warn); }
+  .pill.l3 { color: var(--danger); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  footer {
+    max-width: none;
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-firm);
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    color: var(--muted);
+  }
+
+  .backtop {
+    position: fixed; right: 1rem; bottom: 1rem; z-index: 40;
+    font-family: var(--font-mono); font-size: .7rem;
+    background: var(--surface); border: 1px solid var(--border-firm);
+    border-radius: 999px; padding: .5rem .8rem; color: var(--ink-soft);
+    text-decoration: none; box-shadow: var(--shadow);
+  }
+  @media (min-width: 1000px) { .backtop { display: none; } }
+</style>
+
+<div class="topbar">
+  <div class="brand">
+    <b>🐝 MOUMEN Apiary AI</b>
+    <span>Document d'architecture · v0.1</span>
+  </div>
+  <button class="theme-toggle" id="themeToggle" type="button">Thème</button>
+</div>
+
+<div class="shell">
+  <nav class="toc" id="toc" aria-label="Sommaire">
+    <div class="toc-part">Partie A — Fondations</div>
+    <a href="#s0"><span class="n">00</span>Contexte &amp; décisions</a>
+    <div class="toc-part">Partie B — Architecture applicative</div>
+    <a href="#s1"><span class="n">01</span>Architecture Web</a>
+    <a href="#s2"><span class="n">02</span>Frontend</a>
+    <a href="#s3"><span class="n">03</span>Backend</a>
+    <a href="#s4"><span class="n">04</span>Base de données</a>
+    <div class="toc-part">Partie C — Le cerveau MOUMEN</div>
+    <a href="#s5"><span class="n">05</span>Architecture MOUMEN AI</a>
+    <a href="#s6"><span class="n">06</span>Voice</a>
+    <a href="#s7"><span class="n">07</span>Vision</a>
+    <a href="#s8"><span class="n">08</span>AI Orchestrator</a>
+    <a href="#s9"><span class="n">09</span>Function Calling</a>
+    <a href="#s10"><span class="n">10</span>Context Engine</a>
+    <div class="toc-part">Partie D — Données &amp; API</div>
+    <a href="#s11"><span class="n">11</span>Schéma de base de données</a>
+    <a href="#s12"><span class="n">12</span>Endpoints API</a>
+    <div class="toc-part">Partie E — Sécurité &amp; accès</div>
+    <a href="#s13"><span class="n">13</span>Authentification</a>
+    <a href="#s14"><span class="n">14</span>Sécurité</a>
+    <div class="toc-part">Partie F — Terrain &amp; résilience</div>
+    <a href="#s15"><span class="n">15</span>Architecture offline</a>
+    <a href="#s16"><span class="n">16</span>Synchronisation</a>
+    <a href="#s17"><span class="n">17</span>PWA</a>
+    <div class="toc-part">Partie G — Interface</div>
+    <a href="#s18"><span class="n">18</span>Pages</a>
+    <a href="#s19"><span class="n">19</span>Composants</a>
+    <a href="#s20"><span class="n">20</span>User flows</a>
+    <div class="toc-part">Partie H — Qualité &amp; livraison</div>
+    <a href="#s21"><span class="n">21</span>Stratégie de tests</a>
+    <a href="#s22"><span class="n">22</span>Déploiement</a>
+    <a href="#s23"><span class="n">23</span>Roadmap MVP → Production</a>
+    <div class="toc-part">Annexe</div>
+    <a href="#annexe"><span class="n">A1</span>Structure du monorepo</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="kicker">Blueprint technique — à valider avant implémentation</div>
+      <h1>MOUMEN Apiary AI — Architecture de la plateforme</h1>
+      <p class="lead">Un copilote numérique pour l'apiculteur : voix, vision, texte et données réelles du rucher, réunis autour d'un assistant conversationnel. Ce document décrit les 23 volets d'architecture demandés au §65 du cahier des charges, puis la feuille de route MVP → production.</p>
+      <div class="meta-row">
+        <span>Frontend&nbsp;: <b>React + TypeScript + Vite</b></span>
+        <span>Backend&nbsp;: <b>Node.js + TypeScript (Fastify)</b></span>
+        <span>Infra&nbsp;: <b>Supabase</b> (Postgres · Auth · Storage)</span>
+        <span>IA par défaut&nbsp;: <b>Gemini 2.5</b> derrière <code>AIProvider</code></span>
+        <span>Devise&nbsp;: <b>DZD / DA</b></span>
+        <span>Langues&nbsp;: <b>AR · FR · EN</b> (RTL/LTR)</span>
+      </div>
+    </header>
+
+    <!-- ============ PARTIE A ============ -->
+    <div class="part-head" id="part-a">
+      <div class="lbl">Partie A</div>
+      <h2>Fondations</h2>
+    </div>
+
+    <section class="doc" id="s0">
+      <h3><span class="snum">00</span>Contexte &amp; décisions de départ</h3>
+
+      <h4>Ce qui existe déjà</h4>
+      <p>Un prototype fonctionnel mono-fichier (<code>MOUMEN-ASSISTANT.html</code>) : session temps réel avec l'API <em>Gemini Live</em> (<code>gemini-2.5-flash-native-audio</code>), capture micro + caméra dans le navigateur, transcription entrée/sortie, synthèse vocale, et <em>function calling</em> de démonstration (<code>setAlarm</code>, <code>getWeather</code>). La clé API est saisie côté client et stockée en <code>localStorage</code>.</p>
+      <p>Ce prototype valide la brique <strong>Voice + Vision temps réel</strong>. Il n'est <strong>pas</strong> la base de production : la clé API doit passer côté serveur, les données doivent être persistées, et les outils doivent être reliés à une vraie base métier. Le prototype devient la référence d'implémentation du module <a href="#s6">Voice</a>.</p>
+
+      <h4>Décisions de stack (validées)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Domaine</th><th>Choix</th><th>Raison</th></tr></thead>
+          <tbody>
+            <tr><td>Frontend</td><td>React 18 + TypeScript + Vite + Tailwind + React Router</td><td>SPA installable en PWA, offline-first, pas de contrainte SSR. Écosystème mature pour Web APIs (média, IndexedDB).</td></tr>
+            <tr><td>Backend</td><td>Node.js 20 + TypeScript + Fastify + Prisma</td><td>Langage unique avec le frontend. Fastify&nbsp;: perf, schémas JSON natifs, streaming (SSE). Prisma&nbsp;: migrations typées.</td></tr>
+            <tr><td>Base / Auth / Storage</td><td>Supabase (PostgreSQL managé, Auth JWT+OAuth, Storage S3, Realtime)</td><td>Accélère fortement le MVP. Postgres relationnel conforme au cahier des charges. Row-Level Security pour l'isolation multi-utilisateurs. Self-hostable ensuite.</td></tr>
+            <tr><td>IA</td><td>Gemini 2.5 par défaut, derrière une couche <code>AIProvider</code></td><td>Multimodal (texte/image/audio), Live API pour la voix, function calling natif. Le contrat d'interface permet de basculer vers un autre fournisseur sans toucher à l'orchestrateur.</td></tr>
+            <tr><td>Hébergement</td><td>Frontend&nbsp;: CDN edge (Vercel/Netlify). Backend&nbsp;: conteneur (Fly.io/Railway/VPS). DB&nbsp;: Supabase.</td><td>Séparation nette. Le backend est stateless et scalable horizontalement.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Principes directeurs non négociables</h4>
+      <div class="callout rule">
+        <p><span class="tag">Règle d'or</span></p>
+        <p><code>REAL DATA → REAL CONTEXT → AI REASONING → VALIDATION → USER CONFIRMATION → ACTION → AUDIT LOG</code></p>
+        <p>Aucune donnée critique (inspection, finance, reine, traitement, suppression) n'est créée ou modifiée sans validation de schéma, vérification des permissions et — au-delà de la lecture — confirmation explicite de l'utilisateur. Chaque écriture sensible produit une entrée d'audit.</p>
+      </div>
+      <ul>
+        <li><strong>AI-first, Voice-first, Vision-first, Field-first, Data-first, Offline-first</strong> — dans cet ordre de priorité produit.</li>
+        <li><strong>Anti-hallucination (§35)</strong> — l'IA ne répond sur le rucher qu'à partir de données retournées par un outil. Donnée absente&nbsp;: « <em>Je ne possède pas cette information dans vos données.</em> »</li>
+        <li><strong>Prudence sanitaire (§34)</strong> — jamais de diagnostic affirmatif. Toujours&nbsp;: observation → confiance → interprétation → à vérifier → recommandation.</li>
+        <li><strong>Historique inviolable</strong> — soft delete uniquement, jamais de suppression en cascade silencieuse de l'historique d'une ruche.</li>
+      </ul>
+    </section>
+
+    <!-- ============ PARTIE B ============ -->
+    <div class="part-head" id="part-b">
+      <div class="lbl">Partie B</div>
+      <h2>Architecture applicative</h2>
+    </div>
+
+    <section class="doc" id="s1">
+      <h3><span class="snum">01</span>Architecture Web complète</h3>
+      <p>Application Web moderne, responsive, PWA, offline-first, multilingue. Trois couches lisibles&nbsp;: un client riche qui fonctionne hors-ligne, une API applicative sans état qui garde les secrets et orchestre l'IA, une plateforme de données managée.</p>
+      <figure class="wide">
+        <figcaption>Vue d'ensemble — du terrain à la base</figcaption>
+        <pre class="diagram">┌─────────────────────────────────────────────────────────────┐
+│  NAVIGATEUR  ·  Chrome / Edge / Firefox / Safari             │
+│  desktop · laptop · tablette · smartphone                    │
+│                                                             │
+│   React SPA (PWA installable)                                │
+│   ├── Service Worker  → cache app-shell + médias             │
+│   ├── IndexedDB       → source de vérité locale (offline)    │
+│   ├── Sync Queue      → file d'opérations différées          │
+│   ├── Web APIs        → MediaDevices, SpeechRecognition,     │
+│   │                     Notifications, Geolocation           │
+│   └── MOUMEN Voice    → WebSocket direct vers Gemini Live    │
+│                          (jeton éphémère fourni par l'API)   │
+└───────────────┬─────────────────────────────────────────────┘
+                │  HTTPS · REST/JSON · JWT · SSE (streaming IA)
+                ▼
+┌─────────────────────────────────────────────────────────────┐
+│  API  ·  Node.js + TypeScript + Fastify   (sans état)        │
+│  ├── Auth guard (JWT Supabase) + RBAC                        │
+│  ├── Domaines métier : apiaries, hives, inspections, …       │
+│  ├── AI Orchestrator : intent · context · tools · validation │
+│  ├── AIProvider (Gemini par défaut)                          │
+│  ├── Sync engine : /sync/batch, résolution de conflits      │
+│  └── Reports : PDF · CSV · Excel                             │
+└───────────────┬─────────────────────────────────────────────┘
+                │
+                ▼
+┌─────────────────────────────────────────────────────────────┐
+│  SUPABASE                                                    │
+│  ├── PostgreSQL (RLS par user_id / org_id)                   │
+│  ├── Auth (email, OAuth Google, magic link)                  │
+│  ├── Storage S3 (photos, audio, justificatifs, exports)      │
+│  └── Realtime (push des deltas de synchro)                   │
+└─────────────────────────────────────────────────────────────┘
+        ▲                                   │
+        │        ┌──────────────────────────┘
+        │        ▼
+   ┌────────────────────┐   ┌────────────────────────────────┐
+   │  Services IA       │   │  Services externes (préparés)  │
+   │  Gemini 2.5        │   │  Météo · Cartes/GPS · IoT/MQTT │
+   │  (texte/vision/    │   │  (branchés en V3 / V4)         │
+   │   audio · tools)   │   └────────────────────────────────┘
+   └────────────────────┘</pre>
+      </figure>
+      <h4>Points structurants</h4>
+      <ul>
+        <li><strong>Client autonome</strong> — toutes les opérations « terrain » (consulter, inspecter, observer, photographier, créer une tâche) fonctionnent sans réseau, contre IndexedDB. Voir <a href="#s15">§15</a>.</li>
+        <li><strong>API sans état</strong> — pas de session serveur ; tout le contexte transite par le JWT et le corps de requête. Scalable horizontalement, redémarrable sans perte.</li>
+        <li><strong>Secrets côté serveur</strong> — aucune clé IA privée dans le bundle JS en production (<a href="#s14">§14</a>). La voix temps réel utilise un jeton éphémère à courte durée émis par l'API.</li>
+        <li><strong>Streaming</strong> — les réponses de MOUMEN arrivent en flux (SSE) pour un ressenti conversationnel.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s2">
+      <h3><span class="snum">02</span>Architecture frontend</h3>
+      <p>Architecture modulaire par <em>feature</em>. Chaque domaine métier est une tranche verticale autonome (composants, hooks, requêtes, types, store local). Les <em>services</em> transverses sont partagés.</p>
+      <figure>
+        <figcaption>src/ — arborescence</figcaption>
+        <pre class="code"><span class="c">src/</span>
+├── app/            <span class="c"># bootstrap, providers, router, i18n init</span>
+├── components/     <span class="c"># design system : Button, Card, Modal, Table, Chart…</span>
+├── layouts/        <span class="c"># AppShell (sidebar), FieldShell (mobile), AuthShell</span>
+├── pages/          <span class="c"># assemblage de features par route</span>
+├── features/
+│   ├── dashboard/  apiaries/  hives/  inspections/  tasks/
+│   ├── queens/     treatments/  harvests/  finance/
+│   ├── analytics/  reports/  moumen_ai/
+│   └── <span class="c">chaque feature : components/ hooks/ api.ts model.ts store.ts</span>
+├── services/
+│   ├── api/        <span class="c"># client REST typé + intercepteurs (JWT, ret/offline)</span>
+│   ├── ai/         <span class="c"># client MOUMEN : chat, stream, confirmations</span>
+│   ├── voice/      <span class="c"># session Gemini Live, VAD, TTS, barge-in</span>
+│   ├── vision/     <span class="c"># capture caméra, upload, pipeline d'analyse</span>
+│   ├── storage/    <span class="c"># IndexedDB (Dexie), Cache API, quotas</span>
+│   └── sync/       <span class="c"># sync queue, réconciliation, statut réseau</span>
+├── store/          <span class="c"># état global léger (Zustand) : session, réseau, contexte courant</span>
+├── hooks/          <span class="c"># useOnlineStatus, useContextEngine, usePermissions…</span>
+├── types/          <span class="c"># types partagés générés depuis le schéma Prisma/OpenAPI</span>
+├── utils/          <span class="c"># dates locales, formats DZD, unités, validation Zod</span>
+└── i18n/           <span class="c"># ar/ fr/ en/ — clés + gestion RTL</span></pre>
+      </figure>
+      <h4>Choix techniques</h4>
+      <ul>
+        <li><strong>Data layer</strong> — TanStack Query pour le cache serveur + <code>persister</code> IndexedDB ; mutations optimistes qui écrivent d'abord dans la sync queue.</li>
+        <li><strong>État global</strong> — Zustand pour le peu d'état vraiment global (utilisateur, statut réseau, <em>contexte courant</em> alimentant le Context Engine). Le reste est local à la feature.</li>
+        <li><strong>Formulaires + validation</strong> — React Hook Form + Zod ; les mêmes schémas Zod valident côté client et sont dérivés des schémas d'outils IA.</li>
+        <li><strong>Routing</strong> — React Router, lazy-loading par route, <em>code splitting</em> par feature.</li>
+        <li><strong>Rendu terrain</strong> — un <code>FieldShell</code> distinct (gros boutons, contraste élevé, utilisable avec des gants) activé sur mobile ou via un interrupteur « Mode terrain » (<a href="#s18">§18/24</a>).</li>
+        <li><strong>Accessibilité</strong> — cibles ≥ 44px, focus visible, ARIA sur les composants interactifs, respect de <code>prefers-reduced-motion</code>, contrastes AA.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s3">
+      <h3><span class="snum">03</span>Architecture backend</h3>
+      <p>API Fastify découpée en modules métier + un noyau IA. Chaque module expose&nbsp;: <em>routes</em> (schéma JSON) → <em>controller</em> → <em>service</em> (logique + permissions) → <em>repository</em> (Prisma). Les <em>tools</em> IA réutilisent la couche <em>service</em>, ils ne dupliquent jamais la logique.</p>
+      <figure>
+        <figcaption>backend/ — arborescence</figcaption>
+        <pre class="code"><span class="c">backend/src/</span>
+├── server.ts               <span class="c"># bootstrap Fastify, plugins, hooks</span>
+├── core/
+│   ├── auth/               <span class="c"># vérif JWT Supabase, RBAC, guards</span>
+│   ├── db/                 <span class="c"># Prisma client, transactions, RLS context</span>
+│   ├── validation/         <span class="c"># schémas Zod partagés</span>
+│   ├── errors/             <span class="c"># AppError, mapping HTTP, i18n messages</span>
+│   ├── audit/              <span class="c"># écriture audit_logs</span>
+│   └── ratelimit/          <span class="c"># par IP + par utilisateur + par route IA</span>
+├── modules/
+│   ├── users/  apiaries/  hives/  inspections/  queens/
+│   ├── treatments/  tasks/  harvests/  finance/
+│   ├── attachments/  notifications/  reports/
+│   └── <span class="c"># chacun : *.routes.ts *.controller.ts *.service.ts *.repo.ts *.schema.ts</span>
+├── ai/
+│   ├── provider/           <span class="c"># AIProvider interface + GeminiProvider</span>
+│   ├── orchestrator/       <span class="c"># boucle : plan → tool calls → validate → respond</span>
+│   ├── intent/             <span class="c"># classification d'intention + routage</span>
+│   ├── context/            <span class="c"># Context Engine : assemble le contexte serveur</span>
+│   ├── tools/              <span class="c"># registre : 1 fichier par tool, schéma + handler + niveau</span>
+│   ├── vision/             <span class="c"># pipeline analyse image → observations structurées</span>
+│   ├── voice/              <span class="c"># émission de jetons éphémères, logs de session</span>
+│   ├── knowledge/          <span class="c"># Apiary Knowledge Engine (règles métier, seuils)</span>
+│   └── guards/             <span class="c"># anti-hallucination, prudence sanitaire, confirmations</span>
+├── sync/                   <span class="c"># /sync/batch, résolution de conflits, deltas</span>
+├── storage/                <span class="c"># URLs signées Supabase Storage, quotas, EXIF strip</span>
+└── jobs/                   <span class="c"># cron : alertes, rappels, recalcul de stats, backups</span></pre>
+      </figure>
+      <h4>Conventions</h4>
+      <ul>
+        <li><strong>Contrat unique</strong> — les schémas Zod/JSON sont la source de vérité ; l'OpenAPI et les types frontend en sont dérivés.</li>
+        <li><strong>Permissions au niveau service</strong> — chaque méthode de service reçoit le <code>userContext</code> (id, rôle, org) et filtre/refuse en conséquence. La RLS Postgres est la seconde barrière.</li>
+        <li><strong>Transactions</strong> — toute écriture multi-tables (inspection + observations + pièces jointes) est transactionnelle ; l'audit est écrit dans la même transaction.</li>
+        <li><strong>Idempotence</strong> — les endpoints d'écriture acceptent un <code>client_uuid</code> pour absorber les rejeux de la sync queue.</li>
+        <li><strong>Jobs</strong> — un worker séparé (même image) traite le cron&nbsp;: détection d'alertes (<a href="#s18">§13 fonctionnel</a>), rappels, recalculs, sauvegardes.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s4">
+      <h3><span class="snum">04</span>Architecture base de données</h3>
+      <p>PostgreSQL relationnel, une seule base. Multi-tenant par <code>owner_id</code> (utilisateur) et, en V4, <code>org_id</code> (collaboration). Conventions transverses appliquées à toutes les tables&nbsp;:</p>
+      <ul>
+        <li><strong>Clé primaire</strong> <code>id uuid default gen_random_uuid()</code>.</li>
+        <li><strong>Horodatage</strong> <code>created_at</code>, <code>updated_at</code> (trigger), <code>deleted_at</code> nullable (soft delete).</li>
+        <li><strong>Traçabilité</strong> <code>created_by</code>, <code>owner_id</code> ; <code>client_uuid</code> unique pour l'idempotence offline.</li>
+        <li><strong>RLS</strong> activée partout&nbsp;: <code>owner_id = auth.uid()</code> (+ règles org en V4).</li>
+        <li><strong>Intégrité</strong> — FK avec <code>on delete restrict</code> sur l'historique ; jamais de <code>cascade</code> destructif. Les statuts sont des <code>enum</code> Postgres ou des tables de référence.</li>
+        <li><strong>Index</strong> — sur toutes les FK, sur <code>(owner_id, deleted_at)</code>, et index temporels sur <code>inspections(hive_id, performed_at desc)</code>.</li>
+      </ul>
+      <p>Le schéma détaillé des 20+ tables est en <a href="#s11">§11</a>. Les données IA (observations, recommandations, sessions de conversation) sont dans des tables dédiées, jamais mêlées aux données saisies par l'apiculteur — la distinction <em>données enregistrées / observations IA / recommandations IA</em> est structurelle.</p>
+    </section>
+
+    <!-- ============ PARTIE C ============ -->
+    <div class="part-head" id="part-c">
+      <div class="lbl">Partie C</div>
+      <h2>Le cerveau MOUMEN</h2>
+    </div>
+
+    <section class="doc" id="s5">
+      <h3><span class="snum">05</span>Architecture MOUMEN AI</h3>
+      <p>MOUMEN n'est pas un chatbot isolé posé à côté du CRUD&nbsp;: c'est la couche d'interaction principale. Trois entrées (voix, vision, chat) convergent vers un orchestrateur unique qui raisonne sur des <em>outils</em> reliés à la base métier.</p>
+      <figure class="wide">
+        <figcaption>Vue conceptuelle</figcaption>
+        <pre class="diagram">                        🧠 MOUMEN ASSISTANT
+                               │
+          ┌────────────────────┼────────────────────┐
+        🎙️ VOICE             📷 VISION             💬 CHAT
+          └────────────────────┼────────────────────┘
+                               ▼
+                      AI ORCHESTRATOR
+              intent · context · plan · tools · validation
+                               ▼
+          ┌────────────────────┼────────────────────┐
+       🐝 RUCHES             📊 DATA              📅 TASKS
+       🍯 Récoltes           💰 Finance           📈 Stats
+                               ▼
+                           DATABASE
+                     (via tools + Knowledge Engine)</pre>
+      </figure>
+      <h4>Sous-systèmes</h4>
+      <div class="cards">
+        <div class="card"><h5>Intent Engine</h5><p>Classe la demande (lecture / action / analyse / navigation) et la route. Résout les références déictiques (« elle », « cette ruche ») avec le contexte de page.</p></div>
+        <div class="card"><h5>Context Engine</h5><p><a href="#s10">§10</a> — assemble utilisateur, rucher/ruche courants, date, événements récents, tâches, historique, météo disponible.</p></div>
+        <div class="card"><h5>AI Orchestrator</h5><p><a href="#s8">§8</a> — boucle plan → appels d'outils → validation → confirmation → réponse + audit.</p></div>
+        <div class="card"><h5>Tool Registry</h5><p><a href="#s9">§9</a> — ~40 outils à schéma strict, chacun avec niveau de confirmation et contrôle de permission.</p></div>
+        <div class="card"><h5>Apiary Knowledge Engine</h5><p>Couche métier séparée&nbsp;: seuils (reine « ancienne », inspection « en retard »), règles saisonnières, vocabulaire apicole. Configurable par l'utilisateur.</p></div>
+        <div class="card"><h5>Guards</h5><p>Anti-hallucination, prudence sanitaire, politique de confirmation. S'appliquent <em>après</em> le raisonnement, <em>avant</em> la réponse et l'action.</p></div>
+      </div>
+      <h4>La couche <code>AIProvider</code></h4>
+      <p>Interface stable qui isole le reste de l'application du fournisseur&nbsp;:</p>
+      <figure>
+        <figcaption>ai/provider/AIProvider.ts</figcaption>
+        <pre class="code"><span class="k">interface</span> AIProvider {
+  chat(messages, tools, opts): AsyncIterable&lt;<span class="s">ChatDelta</span>&gt;   <span class="c">// streaming + tool calls</span>
+  embed(text): Promise&lt;<span class="s">number</span>[]&gt;
+  analyzeImage(image, prompt, schema): Promise&lt;<span class="s">VisionResult</span>&gt;
+  createRealtimeToken(scope): Promise&lt;<span class="s">EphemeralToken</span>&gt;  <span class="c">// voix</span>
+  transcribe(audio): Promise&lt;<span class="s">Transcript</span>&gt;
+  synthesize(text, voice, lang): Promise&lt;<span class="s">AudioStream</span>&gt;
+}
+<span class="c">// Implémentations : GeminiProvider (défaut) · [OpenAIProvider] · [AnthropicProvider]</span>
+<span class="c">// Sélection par variable d'env AI_PROVIDER, sans changement dans l'orchestrateur.</span></pre>
+      </figure>
+    </section>
+
+    <section class="doc" id="s6">
+      <h3><span class="snum">06</span>Architecture Voice</h3>
+      <p>Conversation vocale naturelle dans le navigateur&nbsp;: micro → transcription → raisonnement → réponse parlée, avec interruption (barge-in) et détection de parole. Deux modes selon la latence recherchée.</p>
+      <figure class="wide">
+        <figcaption>Chemin temps réel (Gemini Live)</figcaption>
+        <pre class="diagram">Navigateur                         API                    Gemini Live
+   │  1. POST /ai/voice/token  ─────►│                         │
+   │  ◄──── jeton éphémère (60 s, scope=voice, user)           │
+   │                                                           │
+   │  2. WebSocket direct (jeton) ────────────────────────────►│
+   │     ── flux PCM 16 kHz (micro, VAD local)                 │
+   │     ── frames JPEG 1 fps (si caméra active)               │
+   │  ◄── flux audio 24 kHz + transcriptions in/out ───────────│
+   │  ◄── toolCall(name, args) ───────────────────────────────│
+   │  3. exécute le tool via API ───►│  orchestrator/validate   │
+   │  4. renvoie toolResponse ───────────────────────────────►│
+   │  ◄── audio de synthèse (réponse finale) ─────────────────│
+   │  5. barge-in : nouvelle parole détectée → stop lecture    │
+   │  6. à la fin : POST /ai/voice/session (transcript, durée) │</pre>
+      </figure>
+      <h4>Composants</h4>
+      <ul>
+        <li><strong>Capture</strong> — <code>getUserMedia</code>, <code>AudioContext</code> 16 kHz, <code>ScriptProcessor</code>/<code>AudioWorklet</code> → PCM base64 (repris du prototype).</li>
+        <li><strong>VAD</strong> — détection d'activité vocale locale pour ne streamer que la parole et gérer le barge-in.</li>
+        <li><strong>Lecture</strong> — file de buffers 24 kHz avec <code>nextStartTime</code> (repris du prototype) ; <code>interrupted</code> vide la file.</li>
+        <li><strong>Langue</strong> — sélectionnée par l'utilisateur (AR/FR/EN) ; passée dans la config de session et le TTS.</li>
+        <li><strong>Fallback</strong> — hors connexion ou navigateur non compatible&nbsp;: <code>SpeechRecognition</code>/<code>SpeechSynthesis</code> Web + raisonnement en différé (mode texte). L'UI l'indique.</li>
+        <li><strong>Sécurité</strong> — jamais la clé API dans le client&nbsp;: jeton éphémère à portée réduite, révocable, journalisé (<a href="#s14">§14</a>).</li>
+        <li><strong>Historique</strong> — chaque session écrit <code>conversation_sessions</code> + <code>conversation_messages</code> (transcript, outils appelés, durée).</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s7">
+      <h3><span class="snum">07</span>Architecture Vision — MOUMEN VISION</h3>
+      <p>Accès caméra après autorisation explicite. Trois modes&nbsp;: <strong>Live camera</strong>, <strong>Import d'image</strong>, <strong>Analyse IA</strong>. L'analyse ne produit jamais un diagnostic&nbsp;: elle produit une structure prudente.</p>
+      <figure class="wide">
+        <figcaption>Pipeline d'analyse</figcaption>
+        <pre class="diagram">Image (capture ou upload)
+   ▼  compression client (max ~1600px, JPEG q0.7) · strip EXIF GPS
+Upload → Supabase Storage (URL signée)  ──► attachments (catégorie, ruche, inspection)
+   ▼
+POST /ai/vision/analyze { image_id, hint?, hive_id?, step? }
+   ▼  AIProvider.analyzeImage(image, prompt, schema strict)
+   ▼
+Résultat structuré, jamais affirmatif :
+   ┌──────────────────────────────────────────────┐
+   │ OBSERVATION      ce qui est visible           │
+   │ CONFIANCE        faible / moyenne / élevée    │
+   │ INTERPRÉTATION   hypothèse, au conditionnel   │
+   │ À VÉRIFIER       gestes de contrôle humain    │
+   │ RECOMMANDATION   action proposée, optionnelle │
+   └──────────────────────────────────────────────┘
+   ▼
+Stocké dans ai_observations (lié image + ruche + inspection)
+   ▼  jamais écrit dans les champs d'inspection sans validation utilisateur</pre>
+      </figure>
+      <h4>Cibles d'analyse (quand techniquement possible)</h4>
+      <p>Ruche, cadres, abeilles, couvain, entrée, réserves, reine si visible, équipements, anomalies visuelles potentielles.</p>
+      <div class="callout rule">
+        <p><span class="tag">Prudence — §34</span></p>
+        <p>Jamais «&nbsp;cette ruche a telle maladie&nbsp;». Toujours «&nbsp;une anomalie visuelle potentielle a été observée, une vérification humaine est nécessaire&nbsp;». Formulations imposées&nbsp;: <em>observation potentielle, indice, estimation, probabilité, à vérifier, information générale</em>.</p>
+      </div>
+    </section>
+
+    <section class="doc" id="s8">
+      <h3><span class="snum">08</span>AI Orchestrator</h3>
+      <p>Couche centrale qui transforme une demande en langage naturel en actions validées. Boucle bornée (max N itérations d'outils) et entièrement journalisée.</p>
+      <figure class="wide">
+        <figcaption>Pipeline</figcaption>
+        <pre class="diagram">USER  (voix / vision / chat)
+ ▼
+MOUMEN ASSISTANT        normalise l'entrée (texte + pièces jointes + langue)
+ ▼
+INTENT ENGINE           lecture · action · analyse · navigation ; résout « elle »
+ ▼
+CONTEXT ENGINE          injecte user · rucher · ruche · date · events · tasks · météo
+ ▼
+AI ORCHESTRATOR         plan → sélection d'outils (function calling)
+ │
+ ├─► TOOLS ──► DATABASE / VISION / CALENDAR / REPORTS      (résultats structurés)
+ │      ▲                                                   │
+ │      └──────────── boucle bornée (re-plan si besoin) ◄───┘
+ ▼
+VALIDATION             schéma des paramètres · permissions RBAC · RLS
+ ▼                     garde anti-hallucination (réponse ⊆ données retournées)
+ ▼                     garde prudence sanitaire (pas d'affirmation médicale)
+ ▼
+CONFIRMATION           niveau 1 : aucune · niveau 2 : « Confirmer ? » · niveau 3 : modale
+ ▼
+RESPONSE (stream SSE)  +  AUDIT LOG (intent, tools, args, résultat, latence, coût)</pre>
+      </figure>
+      <h4>Responsabilités</h4>
+      <ul>
+        <li><strong>Contexte &amp; mémoire</strong> — fenêtre de conversation + mémoire métier via le Knowledge Engine ; pas de mémoire cachée hors base.</li>
+        <li><strong>Permissions</strong> — chaque appel d'outil est ré-autorisé côté serveur, indépendamment de ce que le modèle « croit » pouvoir faire.</li>
+        <li><strong>Validation</strong> — paramètres (Zod), cohérence métier (ruche existe, appartient à l'utilisateur), fenêtre temporelle plausible.</li>
+        <li><strong>Confirmation</strong> — voir <a href="#s14">§23 fonctionnel</a> ci-dessous ; l'orchestrateur renvoie une <em>proposition d'action</em> que le client doit confirmer avant exécution réelle.</li>
+        <li><strong>Erreurs</strong> — un échec d'outil est renvoyé au modèle en tant que résultat (pas d'exception silencieuse) ; après N échecs, réponse honnête d'impossibilité.</li>
+        <li><strong>Observabilité</strong> — chaque tour&nbsp;: tokens, latence, outils, coût estimé → métriques (<a href="#s21">§50 fonctionnel</a>).</li>
+      </ul>
+      <div class="callout danger">
+        <p><span class="tag">Confirmation des actions — §23</span></p>
+        <div class="table-wrap" style="margin:.6rem 0 0;box-shadow:none;border-color:var(--border)">
+          <table>
+            <thead><tr><th>Niveau</th><th>Portée</th><th>Comportement</th></tr></thead>
+            <tbody>
+              <tr><td><span class="pill l1">1 · lecture</span></td><td>« Combien de ruches ai-je&nbsp;? », résumés, statistiques</td><td>Exécution directe, aucune confirmation.</td></tr>
+              <tr><td><span class="pill l2">2 · action réversible</span></td><td>Créer une inspection, une tâche, une observation</td><td>«&nbsp;Je vais créer une inspection pour la ruche 12. Confirmer&nbsp;?&nbsp;» — accord requis.</td></tr>
+              <tr><td><span class="pill l3">3 · action sensible</span></td><td>Suppression, modification importante, opération financière, action irréversible</td><td>Modale de confirmation explicite&nbsp;: [ Annuler ] [ Confirmer ]. Jamais d'exécution implicite.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc" id="s9">
+      <h3><span class="snum">09</span>Function calling — registre d'outils</h3>
+      <p>Chaque outil&nbsp;: schéma strict (Zod → JSON Schema), validation des paramètres, vérification des permissions, résultat structuré, gestion d'erreur. Un outil = un fichier dans <code>ai/tools/</code>. Réutilise la couche service métier.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Outil</th><th>Rôle</th><th>Niveau</th></tr></thead>
+          <tbody>
+            <tr><td><code>getApiaries()</code> · <code>getApiary(id)</code></td><td>Lister / détailler les ruchers</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>createApiary(...)</code> · <code>updateApiary(id, ...)</code></td><td>Créer / modifier un rucher</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>getHives(filter)</code> · <code>getHive(id)</code></td><td>Lister (faibles, non inspectées…) / détailler une ruche</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>createHive(...)</code> · <code>updateHive(id, ...)</code></td><td>Créer / modifier une ruche</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>archiveHive(id, reason)</code></td><td>Archiver (statut mort/vendu/fusionné) — jamais supprimer</td><td><span class="pill l3">3</span></td></tr>
+            <tr><td><code>createInspection(...)</code> · <code>updateInspection(id, ...)</code></td><td>Enregistrer / corriger une inspection</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>getInspections(hiveId)</code> · <code>getInspectionHistory(hiveId, range)</code></td><td>Historique d'inspections</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>createTask(...)</code> · <code>updateTask(id, ...)</code> · <code>completeTask(id)</code></td><td>Gérer les travaux</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>getUpcomingTasks()</code> · <code>getOverdueTasks()</code></td><td>Tâches à venir / en retard</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>getQueens()</code> · <code>getQueen(id)</code></td><td>Lister / détailler les reines (ex.&nbsp;: reines anciennes)</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>createQueen(...)</code> · <code>updateQueen(id, ...)</code></td><td>Introduire / mettre à jour une reine</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>createTreatment(...)</code> · <code>getTreatments(hiveId)</code></td><td>Traitements sanitaires</td><td><span class="pill l2">2</span> / <span class="pill l1">1</span></td></tr>
+            <tr><td><code>createHarvest(...)</code> · <code>getHarvests(filter)</code></td><td>Récoltes de miel</td><td><span class="pill l2">2</span> / <span class="pill l1">1</span></td></tr>
+            <tr><td><code>getProductionStatistics(range)</code></td><td>Production totale / par ruche / moyenne / évolution</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>createExpense(...)</code> · <code>createRevenue(...)</code></td><td>Dépense / revenu — opération financière</td><td><span class="pill l3">3</span></td></tr>
+            <tr><td><code>getFinancialSummary(range)</code></td><td>Revenus − dépenses = bénéfice, par période</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>searchApiaryData(query)</code></td><td>Recherche en langage naturel → requête sécurisée en lecture</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>generateReport(type, range, format)</code></td><td>Rapport PDF/CSV/Excel à partir des données réelles</td><td><span class="pill l2">2</span></td></tr>
+            <tr><td><code>analyzeImage(imageId, hint?)</code></td><td>Analyse visuelle prudente (<a href="#s7">§7</a>)</td><td><span class="pill l1">1</span></td></tr>
+            <tr><td><code>generateAIInsights(scope)</code></td><td>Synthèses basées uniquement sur les données disponibles</td><td><span class="pill l1">1</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure>
+        <figcaption>ai/tools/createInspection.ts — forme d'un outil</figcaption>
+        <pre class="code"><span class="k">export const</span> createInspectionTool: Tool = {
+  name: <span class="s">"createInspection"</span>,
+  level: <span class="s">2</span>,                          <span class="c">// action réversible → confirmation</span>
+  permission: <span class="s">"inspections:write"</span>,
+  schema: z.object({
+    hive_id: z.string().uuid(),
+    performed_at: z.string().datetime().optional(),
+    colony_strength: z.enum(STRENGTHS).optional(),
+    queen_seen: z.boolean().optional(),
+    brood: z.object({ open: z.boolean(), capped: z.boolean() }).optional(),
+    stores: z.object({ honey: LEVEL, pollen: LEVEL }).optional(),
+    notes: z.string().max(4000).optional(),
+    attachment_ids: z.array(z.string().uuid()).optional(),
+    client_uuid: z.string().uuid(),          <span class="c">// idempotence offline</span>
+  }),
+  handler: <span class="k">async</span> (args, ctx) =&gt; {
+    <span class="k">await</span> assertHiveOwnedBy(args.hive_id, ctx.user);   <span class="c">// permission réelle</span>
+    <span class="k">return</span> inspectionsService.create(args, ctx);   <span class="c">// même service que REST</span>
+  },
+};</pre>
+      </figure>
+    </section>
+
+    <section class="doc" id="s10">
+      <h3><span class="snum">10</span>Context Engine</h3>
+      <p>Construit automatiquement le contexte à chaque tour, pour que l'utilisateur n'ait jamais à répéter où il se trouve. Depuis la fiche de la ruche 12, «&nbsp;ajoute une observation&nbsp;: elle est forte aujourd'hui&nbsp;» est compris sans question.</p>
+      <figure>
+        <figcaption>Objet de contexte (assemblé client + serveur)</figcaption>
+        <pre class="code">ContextSnapshot {
+  currentUser        { id, role, locale, units, currency: <span class="s">"DZD"</span> }
+  currentApiary      { id, name } | null        <span class="c">// depuis la route active</span>
+  currentHive        { id, number, status } | null
+  currentInspection  { id, step } | null        <span class="c">// si smart inspection en cours</span>
+  currentDate        <span class="s">"2026-08-31"</span>  (timezone utilisateur)
+  recentEvents       [ 5 derniers événements de la ruche / du rucher ]
+  tasks              { overdue: n, dueToday: n, upcoming: [...] }
+  historicalData     { lastInspection, strengthTrend, queenAge }   <span class="c"># Knowledge Engine</span>
+  weather            { source, temp, humidity, wind } | null       <span class="c"># jamais inventé</span>
+  page               <span class="s">"hive.detail"</span>   <span class="c"># pour l'Intent Engine (résolution « elle »)</span>
+}</pre>
+      </figure>
+      <ul>
+        <li><strong>Origine</strong> — le client fournit <code>page</code>, <code>currentApiary</code>, <code>currentHive</code> (état global Zustand) ; le serveur complète events/tasks/historique/météo avec des données vérifiées.</li>
+        <li><strong>Portée</strong> — le contexte est passé à l'orchestrateur mais filtré par permissions avant d'atteindre le modèle.</li>
+        <li><strong>Fraîcheur</strong> — recomposé à chaque message ; jamais mis en cache au-delà d'un tour.</li>
+        <li><strong>Absence</strong> — un champ inconnu vaut <code>null</code>, jamais une valeur par défaut inventée (météo notamment).</li>
+      </ul>
+    </section>
+
+    <!-- ============ PARTIE D ============ -->
+    <div class="part-head" id="part-d">
+      <div class="lbl">Partie D</div>
+      <h2>Données &amp; API</h2>
+    </div>
+
+    <section class="doc" id="s11">
+      <h3><span class="snum">11</span>Schéma de base de données</h3>
+      <p>DDL indicatif (PostgreSQL). Colonnes transverses de <a href="#s4">§4</a> omises pour la lisibilité&nbsp;: toutes les tables ont <code>id uuid pk</code>, <code>created_at</code>, <code>updated_at</code>, <code>deleted_at</code>, <code>owner_id</code>, <code>created_by</code>. RLS activée partout.</p>
+      <figure class="wide">
+        <figcaption>Cœur métier</figcaption>
+        <pre class="code"><span class="k">users</span>              <span class="c">-- profil applicatif (miroir de auth.users Supabase)</span>
+  email, display_name, locale <span class="s">ar|fr|en</span>, role <span class="s">owner|manager|viewer</span>,
+  units jsonb, currency text default <span class="s">'DZD'</span>, settings jsonb
+
+<span class="k">apiaries</span>
+  name, location text, lat numeric, lng numeric, notes,
+  photo_attachment_id → attachments
+
+<span class="k">hives</span>
+  apiary_id → apiaries,  number int,  name,  photo_attachment_id → attachments,
+  origin, hive_type, strain,
+  status <span class="s">active|strong|medium|weak|very_weak|dead|sold|merged|archived</span>,
+  strength <span class="s">very_strong|strong|medium|weak|very_weak</span> null,
+  current_queen_id → queens null,
+  last_inspection_at timestamptz null,  next_inspection_at timestamptz null,
+  notes
+  <span class="c">-- index: (owner_id, status, deleted_at), (apiary_id), (next_inspection_at)</span>
+
+<span class="k">queens</span>
+  hive_id → hives null,  introduced_at date,  origin,  strain,
+  birth_year int null,  quality <span class="s">excellent|good|fair|poor</span> null,
+  status <span class="s">active|replaced|dead|removed</span>,  notes
+  <span class="c">-- historique : une ligne par reine, jamais réécrite</span>
+
+<span class="k">inspections</span>
+  hive_id → hives,  performed_at timestamptz,  method <span class="s">manual|voice|camera</span>,
+  colony_strength <span class="s">enum</span> null,
+  queen_present bool null, queen_seen bool null, laying <span class="s">normal|weak|irregular</span> null,
+  brood_open bool null, brood_capped bool null, brood_amount <span class="s">enum</span> null,
+  stores_honey <span class="s">level</span> null, stores_pollen <span class="s">level</span> null, feed <span class="s">level</span> null,
+  health_status <span class="s">enum</span> null,  weather_record_id → weather_records null,
+  ai_summary_id → ai_recommendations null,
+  transcript text null,  notes text,  client_uuid uuid unique
+  <span class="c">-- append-only en pratique ; corrections via updateInspection tracées à l'audit</span>
+
+<span class="k">inspection_observations</span>   <span class="c">-- items structurés d'une inspection</span>
+  inspection_id → inspections,  key text,  value jsonb,  source <span class="s">user|voice|ai</span>
+
+<span class="k">treatments</span>
+  hive_id → hives,  product,  target <span class="s">varroa|nosema|other</span>,  dose,
+  started_at date,  ended_at date null,  notes
+
+<span class="k">tasks</span>
+  title,  type <span class="s">inspection|split|feeding|add_frame|treatment|queen_check|
+              queen_replace|harvest|transfer|merge|seasonal_prep|custom</span>,
+  hive_id → hives null,  apiary_id → apiaries null,
+  priority <span class="s">low|normal|high|urgent</span>,  due_at timestamptz null,
+  status <span class="s">todo|doing|done|cancelled</span>,  recurrence jsonb null,
+  reminder_at timestamptz null,  completed_at timestamptz null,  client_uuid uuid unique
+
+<span class="k">harvests</span>
+  hive_id → hives null,  apiary_id → apiaries,  harvested_at date,
+  batch_code,  honey_type,  quantity_kg numeric,  jars int null,
+  unit_price_dzd numeric null,  client_name null,  notes,  client_uuid uuid unique</pre>
+      </figure>
+      <figure class="wide">
+        <figcaption>Finance · médias · notifications · environnement</figcaption>
+        <pre class="code"><span class="k">expenses</span>
+  spent_at date,  amount_dzd numeric,  category <span class="s">enum</span>,
+  hive_id → hives null,  apiary_id → apiaries null,
+  description,  receipt_attachment_id → attachments null,  client_uuid uuid unique
+
+<span class="k">revenues</span>
+  received_at date,  amount_dzd numeric,  product,  quantity numeric null,
+  unit_price_dzd numeric null,  client_name null,  batch_code null,
+  harvest_id → harvests null,  client_uuid uuid unique
+
+<span class="k">attachments</span>
+  storage_path text,  mime text,  size_bytes bigint,  width int null, height int null,
+  category <span class="s">hive|frame|queen|brood|entrance|pest|health|stores|equipment|other</span>,
+  apiary_id null, hive_id null, inspection_id null, task_id null,
+  taken_at timestamptz null,  caption text
+
+<span class="k">notifications</span>
+  kind <span class="s">inspection_overdue|weak_hive|no_queen|unusual_trend|urgent_task|
+          treatment_due|harvest_due|old_queen|no_inspection|recurring_issue</span>,
+  hive_id null, apiary_id null,  severity <span class="s">normal|watch|attention|urgent</span>,
+  title, body,  read_at timestamptz null,  action jsonb null   <span class="c">-- ex: {createTask:{...}}</span>
+
+<span class="k">weather_records</span>
+  source text,  observed_at timestamptz,  lat numeric, lng numeric,
+  temp_c numeric null, humidity_pct numeric null, wind_kph numeric null,
+  rain_mm numeric null, condition text null
+  <span class="c">-- alimenté uniquement par un service réel ; aucune ligne synthétique</span></pre>
+      </figure>
+      <figure class="wide">
+        <figcaption>Couche IA · audit · synchronisation</figcaption>
+        <pre class="code"><span class="k">ai_observations</span>        <span class="c">-- sorties Vision / analyse, jamais mêlées aux données saisies</span>
+  subject <span class="s">hive|frame|queen|brood|entrance|stores|equipment</span>,
+  hive_id null, inspection_id null, attachment_id null,
+  observation text,  confidence <span class="s">low|medium|high</span>,
+  interpretation text null,  to_verify text null,  model text,  raw jsonb
+
+<span class="k">ai_recommendations</span>
+  scope <span class="s">hive|apiary|global|inspection</span>,  hive_id null, inspection_id null,
+  level <span class="s">normal|watch|attention|urgent</span>,   <span class="c">-- 🟢 🟡 🟠 🔴</span>
+  summary text,  proposed_actions jsonb,  based_on jsonb,   <span class="c">-- ids des données sources</span>
+  model text,  accepted_at timestamptz null
+
+<span class="k">conversation_sessions</span>
+  channel <span class="s">chat|voice|vision</span>,  locale,  started_at, ended_at,
+  duration_s int null,  page text null,  context_snapshot jsonb
+
+<span class="k">conversation_messages</span>
+  session_id → conversation_sessions,  role <span class="s">user|assistant|tool</span>,
+  content text,  tool_name text null,  tool_args jsonb null, tool_result jsonb null,
+  tokens_in int null, tokens_out int null,  latency_ms int null
+
+<span class="k">audit_logs</span>
+  actor_id,  action text,  entity text,  entity_id uuid null,
+  before jsonb null,  after jsonb null,  via <span class="s">ui|ai|sync|job</span>,  ip inet null
+
+<span class="k">sync_operations</span>
+  client_uuid uuid,  entity text,  op <span class="s">create|update|delete</span>,
+  payload jsonb,  base_version int null,  status <span class="s">pending|applied|conflict|failed</span>,
+  device_id text,  applied_at timestamptz null,  conflict jsonb null</pre>
+      </figure>
+      <p><strong>Relations clés</strong>&nbsp;: <code>hives.apiary_id</code>, <code>hives.current_queen_id</code>, <code>inspections.hive_id</code>, <code>queens.hive_id</code>, <code>tasks.hive_id</code>, <code>harvests.apiary_id</code>, <code>attachments.*_id</code>, <code>revenues.harvest_id</code>. Toutes les FK d'historique en <code>on delete restrict</code>.</p>
+    </section>
+
+    <section class="doc" id="s12">
+      <h3><span class="snum">12</span>Endpoints API</h3>
+      <p>REST/JSON sous <code>/api/v1</code>. Auth&nbsp;: <code>Authorization: Bearer &lt;jwt&gt;</code>. Pagination&nbsp;: <code>?cursor=&amp;limit=</code>. Filtres en query string. Toutes les écritures acceptent <code>client_uuid</code>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Méthode &amp; chemin</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /auth/session</code> · <code>POST /auth/refresh</code> · <code>POST /auth/logout</code></td><td>Échange/rafraîchit le JWT (via Supabase Auth). OAuth Google&nbsp;: <code>GET /auth/oauth/google</code>.</td></tr>
+            <tr><td><code>GET /me</code> · <code>PATCH /me</code></td><td>Profil, préférences (langue, unités, devise, seuils Knowledge Engine).</td></tr>
+            <tr><td><code>GET/POST /apiaries</code> · <code>GET/PATCH/DELETE /apiaries/:id</code></td><td>Ruchers (DELETE = soft delete + archivage des ruches liées).</td></tr>
+            <tr><td><code>GET/POST /hives</code> · <code>GET/PATCH /hives/:id</code> · <code>POST /hives/:id/archive</code></td><td>Ruches. <code>GET /hives?status=weak&amp;not_inspected_since=15d&amp;apiary_id=</code>.</td></tr>
+            <tr><td><code>GET /hives/:id/timeline</code></td><td>Fil chronologique fusionné (inspections, travaux, récoltes, traitements, reines, photos).</td></tr>
+            <tr><td><code>GET/POST /hives/:id/inspections</code> · <code>GET/PATCH /inspections/:id</code></td><td>Inspections + <code>inspection_observations</code>. <code>POST</code> accepte pièces jointes et transcript.</td></tr>
+            <tr><td><code>POST /inspections/:id/summary</code></td><td>Déclenche le résumé IA (<a href="#s5">§12 fonctionnel</a>) → <code>ai_recommendations</code>.</td></tr>
+            <tr><td><code>GET/POST /queens</code> · <code>GET/PATCH /queens/:id</code></td><td>Reines + historique.</td></tr>
+            <tr><td><code>GET/POST /treatments</code> · <code>GET/PATCH /treatments/:id</code></td><td>Traitements sanitaires.</td></tr>
+            <tr><td><code>GET/POST /tasks</code> · <code>GET/PATCH /tasks/:id</code> · <code>POST /tasks/:id/complete</code></td><td>Travaux. <code>GET /tasks?scope=overdue|today|week</code>.</td></tr>
+            <tr><td><code>POST /planner/generate</code></td><td>Planificateur intelligent (<a href="#s20">§14 fonctionnel</a>)&nbsp;: renvoie un planning <em>proposé</em>, non appliqué.</td></tr>
+            <tr><td><code>GET/POST /harvests</code> · <code>GET/PATCH /harvests/:id</code></td><td>Récoltes.</td></tr>
+            <tr><td><code>GET/POST /finance/expenses</code> · <code>GET/POST /finance/revenues</code></td><td>Dépenses / revenus.</td></tr>
+            <tr><td><code>GET /finance/summary?range=</code></td><td>Revenus − dépenses = bénéfice ; filtres jour/semaine/mois/année/personnalisé.</td></tr>
+            <tr><td><code>GET /analytics/overview</code> · <code>GET /analytics/production</code> · <code>GET /analytics/colonies</code></td><td>Statistiques interactives + séries temporelles.</td></tr>
+            <tr><td><code>GET /notifications</code> · <code>POST /notifications/:id/read</code></td><td>Alertes intelligentes.</td></tr>
+            <tr><td><code>POST /attachments</code> (signed URL) · <code>GET /attachments/:id</code></td><td>Médias&nbsp;: demande d'URL signée Supabase Storage, puis enregistrement des métadonnées.</td></tr>
+            <tr><td><code>POST /reports</code> · <code>GET /reports/:id</code></td><td>Génération PDF/CSV/Excel asynchrone (job) à partir des données réelles.</td></tr>
+            <tr><td><code>GET /search?q=</code></td><td>Recherche globale classique + langage naturel (route vers <code>searchApiaryData</code>).</td></tr>
+            <tr><td><code>POST /ai/chat</code> (SSE)</td><td>Tour de conversation MOUMEN&nbsp;: <code>{ message, attachments, context, session_id }</code> → flux de deltas + propositions d'action.</td></tr>
+            <tr><td><code>POST /ai/actions/confirm</code></td><td>Exécute une action de niveau 2/3 précédemment proposée (<code>{ action_token }</code>).</td></tr>
+            <tr><td><code>POST /ai/vision/analyze</code></td><td>Analyse d'image prudente (<a href="#s7">§7</a>).</td></tr>
+            <tr><td><code>POST /ai/voice/token</code> · <code>POST /ai/voice/session</code></td><td>Jeton éphémère pour Gemini Live ; clôture + persistance de session.</td></tr>
+            <tr><td><code>POST /ai/insights</code></td><td>Insights basés uniquement sur les données disponibles.</td></tr>
+            <tr><td><code>POST /sync/batch</code> · <code>GET /sync/changes?since=</code></td><td>Envoi d'opérations offline ; récupération des deltas depuis un curseur.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ PARTIE E ============ -->
+    <div class="part-head" id="part-e">
+      <div class="lbl">Partie E</div>
+      <h2>Sécurité &amp; accès</h2>
+    </div>
+
+    <section class="doc" id="s13">
+      <h3><span class="snum">13</span>Authentification</h3>
+      <ul>
+        <li><strong>Fournisseur</strong> — Supabase Auth&nbsp;: email + mot de passe, <em>magic link</em>, OAuth Google. JWT signé (RS256), <code>access_token</code> court (~1 h) + <code>refresh_token</code> rotatif.</li>
+        <li><strong>Stockage client</strong> — tokens en mémoire + <code>refresh_token</code> en cookie <code>HttpOnly</code> <code>Secure</code> <code>SameSite=Lax</code> (pas de token d'accès dans <code>localStorage</code>).</li>
+        <li><strong>Vérification API</strong> — plugin Fastify qui valide la signature JWKS Supabase, charge <code>userContext</code> (id, rôle, org), et l'injecte dans la requête + le contexte RLS Postgres (<code>set local role</code> / <code>request.jwt.claims</code>).</li>
+        <li><strong>RBAC</strong> — rôles <code>owner</code> / <code>manager</code> / <code>viewer</code> (extensible V4 multi-utilisateurs). Permissions granulaires par ressource (<code>inspections:write</code>, <code>finance:read</code>…), vérifiées au niveau service <em>et</em> pour chaque appel d'outil IA.</li>
+        <li><strong>Offline</strong> — l'app reste utilisable avec un <code>access_token</code> expiré tant qu'elle est hors-ligne (lecture/écriture locales) ; au retour du réseau, refresh puis <code>/sync/batch</code>. Échec de refresh → écran de reconnexion, données locales préservées.</li>
+        <li><strong>Voix</strong> — jamais le JWT applicatif envoyé à Gemini&nbsp;: <code>/ai/voice/token</code> émet un jeton éphémère dédié, portée <code>voice</code>, ~60 s, journalisé et révocable.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s14">
+      <h3><span class="snum">14</span>Sécurité</h3>
+      <div class="cards">
+        <div class="card"><h5>Transport</h5><p>HTTPS/HSTS partout. CORS restreint aux origines connues. En-têtes&nbsp;: CSP stricte, <code>X-Content-Type-Options</code>, <code>Referrer-Policy</code>, <code>Permissions-Policy</code> (caméra/micro limités à l'app).</p></div>
+        <div class="card"><h5>Secrets</h5><p><strong>Aucune clé IA privée dans le bundle JS en production.</strong> Tous les appels IA sensibles passent par le backend. Secrets en gestionnaire (Doppler / SOPS / secrets de la plateforme), jamais en repo.</p></div>
+        <div class="card"><h5>Entrées</h5><p>Validation double&nbsp;: Zod côté client + Zod côté serveur. Prisma = requêtes paramétrées (anti-injection). Uploads&nbsp;: type MIME vérifié, taille limitée, EXIF GPS retiré, antivirus optionnel.</p></div>
+        <div class="card"><h5>Débit</h5><p>Rate limiting par IP + par utilisateur ; quotas spécifiques sur <code>/ai/*</code> (coût). Back-pressure sur le streaming.</p></div>
+        <div class="card"><h5>Données</h5><p>RLS Postgres sur toutes les tables. Chiffrement au repos (Supabase). Champs sensibles (notes financières) chiffrés applicativement si requis. Sauvegardes quotidiennes + test de restauration.</p></div>
+        <div class="card"><h5>Traçabilité</h5><p><code>audit_logs</code> sur toute action importante (qui, quoi, avant/après, via ui/ai/sync/job). Logs applicatifs sans données sensibles (<a href="#s21">§50</a>).</p></div>
+        <div class="card"><h5>Fichiers</h5><p>Storage privé par défaut ; accès via URL signée à courte durée, portée à l'utilisateur propriétaire.</p></div>
+        <div class="card"><h5>IA</h5><p>Garde-fous d'orchestration (<a href="#s8">§8</a>)&nbsp;: permissions ré-vérifiées, confirmation niveau 2/3, anti-hallucination, prudence sanitaire. Prompt-injection&nbsp;: le contenu utilisateur/vision n'est jamais traité comme instruction système.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ PARTIE F ============ -->
+    <div class="part-head" id="part-f">
+      <div class="lbl">Partie F</div>
+      <h2>Terrain &amp; résilience</h2>
+    </div>
+
+    <section class="doc" id="s15">
+      <h3><span class="snum">15</span>Architecture offline</h3>
+      <p>L'application doit fonctionner avec une connexion faible ou absente. Le client possède sa propre base locale&nbsp;; le réseau n'est qu'un moyen de synchroniser.</p>
+      <figure>
+        <figcaption>Couche de stockage client</figcaption>
+        <pre class="code"><span class="k">IndexedDB</span> (via Dexie) — source de vérité locale
+  ├── tables miroir : hives, inspections, tasks, queens, harvests, …
+  ├── media_blobs   : photos/audio capturés hors-ligne (avant upload)
+  └── sync_queue    : { client_uuid, entity, op, payload, base_version, ts }
+
+<span class="k">Cache API</span> (Service Worker)
+  ├── app-shell (précache au build)  — stale-while-revalidate
+  ├── GET /api/v1/** en lecture      — network-first, fallback cache
+  └── médias déjà uploadés           — cache-first, LRU + quota
+
+<span class="k">Web APIs</span> : navigator.onLine + events, Background Sync (si dispo),
+             Persistent Storage (demande de quota), Notifications</pre>
+      </figure>
+      <h4>Opérations garanties hors-ligne</h4>
+      <p>Consulter les ruches et l'historique, créer une inspection, ajouter une observation, prendre une photo, créer une tâche. Ces écritures vont dans IndexedDB + <code>sync_queue</code> et sont visibles immédiatement (mutation optimiste).</p>
+      <div class="callout system">
+        <p><span class="tag">Bandeau</span></p>
+        <p>🟠 <strong>Mode hors connexion</strong> — Vos données sont enregistrées localement. Synchronisation automatique dès que la connexion revient.</p>
+      </div>
+      <p>Une inspection enregistrée localement n'est <strong>jamais</strong> perdue&nbsp;: elle reste dans la queue jusqu'à confirmation serveur, même après fermeture de l'app ou redémarrage de l'appareil.</p>
+    </section>
+
+    <section class="doc" id="s16">
+      <h3><span class="snum">16</span>Synchronisation</h3>
+      <figure class="wide">
+        <figcaption>Flux</figcaption>
+        <pre class="diagram">Action hors-ligne
+   ▼
+IndexedDB (appliquée localement, optimiste)
+   ▼
+SYNC QUEUE   { client_uuid, entity, op, payload, base_version }
+   ▼   ┌─── réseau absent → retry backoff exponentiel + jitter
+   ▼
+POST /sync/batch  (ordonné par dépendances : apiary → hive → inspection → attachment)
+   ▼
+Serveur, par opération :
+   ├── client_uuid déjà appliqué ?  → renvoie le résultat existant (idempotent)
+   ├── base_version == version serveur ? → applique, incrémente la version
+   └── sinon → CONFLIT
+        ├── entités additives (inspections, observations, photos) : accepter les deux
+        ├── champs scalaires (statut, notes) : last-write-wins par champ + trace audit
+        └── cas ambigu : marquer conflict, renvoyer les deux versions au client
+   ▼
+Réponse : { applied[], conflicts[], serverChanges[] }
+   ▼
+Client : purge la queue des applied, présente les conflicts, applique serverChanges
+   ▼
+Realtime (Supabase) : push des deltas aux autres appareils du même utilisateur</pre>
+      </figure>
+      <ul>
+        <li><strong>Versionnage</strong> — colonne <code>version int</code> incrémentée à chaque écriture serveur ; le client envoie la <code>base_version</code> sur laquelle il a travaillé.</li>
+        <li><strong>Doublons</strong> — <code>client_uuid</code> unique en base&nbsp;: un rejeu ne crée jamais de seconde ligne.</li>
+        <li><strong>Ordre</strong> — la queue respecte les dépendances de FK&nbsp;; un échec bloquant met en pause la branche concernée, pas toute la queue.</li>
+        <li><strong>Partiel</strong> — un batch peut être appliqué à moitié&nbsp;; la réponse est explicite, la queue conserve le reste.</li>
+        <li><strong>Conflits</strong> — jamais résolus silencieusement sur des données critiques&nbsp;: l'utilisateur voit «&nbsp;version locale / version serveur&nbsp;» et tranche.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s17">
+      <h3><span class="snum">17</span>PWA</h3>
+      <ul>
+        <li><strong>Manifest</strong> — nom, icônes maskables (192/512), <code>display: standalone</code>, <code>theme_color</code>, <code>start_url</code>, orientation libre, raccourcis (Nouvelle inspection, MOUMEN, Ruche active).</li>
+        <li><strong>Service Worker</strong> — Workbox&nbsp;: précache de l'app-shell au build, stratégies par route (<a href="#s15">§15</a>), <em>skip waiting</em> contrôlé + invite «&nbsp;Nouvelle version disponible&nbsp;».</li>
+        <li><strong>Installation</strong> — capture de <code>beforeinstallprompt</code>, bouton «&nbsp;Installer l'application&nbsp;» ; splash screen généré depuis le manifest.</li>
+        <li><strong>Offline</strong> — page de repli, bandeau d'état réseau, file de synchro visible dans Paramètres.</li>
+        <li><strong>Notifications</strong> — Web Push quand supporté (alertes, rappels de tâches) via le worker de jobs ; dégradation propre si refusé/non supporté.</li>
+        <li><strong>Comportement natif</strong> — une fois installée&nbsp;: plein écran, retour arrière géré, persistance du stockage demandée, accès rapide caméra/micro.</li>
+      </ul>
+    </section>
+
+    <!-- ============ PARTIE G ============ -->
+    <div class="part-head" id="part-g">
+      <div class="lbl">Partie G</div>
+      <h2>Interface</h2>
+    </div>
+
+    <section class="doc" id="s18">
+      <h3><span class="snum">18</span>Pages</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Route</th><th>Page</th><th>Contenu</th></tr></thead>
+          <tbody>
+            <tr><td><code>/login</code></td><td>Authentification</td><td>Email / magic link / Google. Choix de langue avant connexion.</td></tr>
+            <tr><td><code>/</code></td><td>Dashboard</td><td>Ruches actives, alertes, inspections/tâches du jour, production, bénéfice, <em>AI Insights</em>, bouton «&nbsp;Parler à MOUMEN&nbsp;». (= MOUMEN AI Command Center, §40.)</td></tr>
+            <tr><td><code>/apiaries</code> · <code>/apiaries/:id</code></td><td>Ruchers</td><td>Liste multi-ruchers, carte (préparée GPS), ruches par rucher.</td></tr>
+            <tr><td><code>/hives</code></td><td>Ruches</td><td>Liste filtrable (statut, force, non inspectées…), vue cartes/tableau.</td></tr>
+            <tr><td><code>/hives/:id</code></td><td>Fiche ruche</td><td>Onglets&nbsp;: Résumé · Inspections · Historique/Timeline · Reine · Traitements · Travaux · Récoltes · Finance · Photos · MOUMEN AI. Encart «&nbsp;Demander à MOUMEN&nbsp;».</td></tr>
+            <tr><td><code>/hives/:id/inspect</code></td><td>Smart Inspection</td><td>Parcours guidé (entrée → cadre → couvain → reine → réserves), voix + caméra + saisie, résumé IA en fin.</td></tr>
+            <tr><td><code>/inspections</code> · <code>/inspections/:id</code></td><td>Inspections</td><td>Liste globale ; détail avec médias, transcript, observations, résumé IA (données enregistrées / observations IA / recommandations IA séparées).</td></tr>
+            <tr><td><code>/calendar</code></td><td>Calendrier</td><td>Vue mois/semaine des tâches et inspections planifiées.</td></tr>
+            <tr><td><code>/tasks</code></td><td>Travaux</td><td>Kanban / liste par priorité, en retard, récurrences.</td></tr>
+            <tr><td><code>/queens</code> · <code>/queens/:id</code></td><td>Reines</td><td>Registre, âge, qualité, historique de remplacement.</td></tr>
+            <tr><td><code>/harvests</code></td><td>Récoltes</td><td>Saisie lot, production totale / par ruche / évolution, meilleures ruches.</td></tr>
+            <tr><td><code>/finance</code></td><td>Finance</td><td>Dépenses / revenus, bénéfice, filtres de période, devise DZD.</td></tr>
+            <tr><td><code>/analytics</code></td><td>Statistiques</td><td>Graphiques interactifs + <em>MOUMEN AI Insights</em>.</td></tr>
+            <tr><td><code>/moumen</code></td><td>MOUMEN Assistant</td><td>Écran central conversation&nbsp;: voix, texte, caméra, image, historique, résumés, analyses.</td></tr>
+            <tr><td><code>/reports</code></td><td>Rapports</td><td>Générateur (rucher, ruche, inspection, financier, annuel, production) → PDF/CSV/Excel.</td></tr>
+            <tr><td><code>/settings</code></td><td>Paramètres</td><td>Profil, langue/RTL, unités, devise, seuils Knowledge Engine, notifications, file de synchro, sessions/appareils, données &amp; export.</td></tr>
+            <tr><td><code>/field</code> · overlay</td><td>Mode terrain</td><td>Interface simplifiée&nbsp;: ruche active, gros boutons Inspecter / Vision / MOUMEN / Observation.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h4>Navigation</h4>
+      <p><strong>Desktop</strong>&nbsp;: sidebar permanente (12 entrées). <strong>Tablette</strong>&nbsp;: sidebar compacte (icônes). <strong>Mobile</strong>&nbsp;: bottom-nav (Home · Ruches · Agenda · MOUMEN · Menu) + accès rapide micro / caméra / ruche active. Le <strong>bouton MOUMEN global</strong> (§41) est présent sur toutes les pages et transmet le contexte courant.</p>
+    </section>
+
+    <section class="doc" id="s19">
+      <h3><span class="snum">19</span>Composants &amp; design system</h3>
+      <p>Identité visuelle&nbsp;: premium, moderne, naturelle, minimaliste, lisible — jamais enfantine. Registre&nbsp;: abeille, miel, cire, nature, AgriTech, SaaS.</p>
+      <div class="cards">
+        <div class="card"><h5>Design tokens</h5><p>Couleurs (miel/ambre, cire, propolis/vert, bois de ruche), échelle typographique, espacement 4px, rayons, ombres, durées de transition. Thème clair + sombre, LTR + RTL.</p></div>
+        <div class="card"><h5>Primitifs</h5><p>Button, IconButton, Input, Select, Checkbox/Radio, Toggle, Textarea, DatePicker, Slider, Tabs, Tooltip, Badge, Pill, Avatar.</p></div>
+        <div class="card"><h5>Structure</h5><p>AppShell, FieldShell, Sidebar, BottomNav, PageHeader, Card, Section, Modal, Drawer, Sheet (mobile), EmptyState, Skeleton.</p></div>
+        <div class="card"><h5>Données</h5><p>DataTable (tri, pagination, virtualisation), FilterBar, StatTile, Chart (ligne/barre/aire), Sparkline, Timeline, Gallery, MediaPicker.</p></div>
+        <div class="card"><h5>Métier</h5><p>HiveCard, HiveStatusPill, StrengthGauge, AlertBanner, AlertLevelTag (🟢🟡🟠🔴), InspectionStepper, QueenBadge, MoneyDZD, PeriodFilter.</p></div>
+        <div class="card"><h5>MOUMEN</h5><p>MoumenButton (global), ChatThread, MessageBubble, VoiceOrb (états écoute/parle), VisionCapture, AnalysisResultCard (observation/confiance/à vérifier), ActionConfirmDialog (niveau 2/3), InsightCard.</p></div>
+      </div>
+      <h4>Fondations</h4>
+      <ul>
+        <li><strong>Feedback</strong> — un contrôle dit exactement ce qui se passe («&nbsp;Enregistrer&nbsp;» → toast «&nbsp;Enregistré&nbsp;»). Erreurs&nbsp;: cause + correction, sans excuse ni vague.</li>
+        <li><strong>États</strong> — chaque écran gère vide / chargement / erreur / hors-ligne / succès.</li>
+        <li><strong>RTL</strong> — propriétés logiques CSS (<code>margin-inline</code>…), miroir des icônes directionnelles, tests visuels en arabe.</li>
+        <li><strong>i18n</strong> — <code>react-i18next</code>, dates/nombres via <code>Intl</code>, unités et devise configurables ; MOUMEN répond dans la langue de l'utilisateur.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s20">
+      <h3><span class="snum">20</span>User flows</h3>
+
+      <h4>Flow principal — la tournée</h4>
+      <figure class="wide">
+        <pre class="diagram">Ouvre l'app → Dashboard
+   │  « Commence ma tournée »  (voix ou bouton)
+   ▼
+MOUMEN : Context Engine + getOverdueTasks + getHives(weak) + planner
+   ▼
+Propose les ruches prioritaires (ordre + raison)          [niveau 1 — lecture]
+   ▼
+L'utilisateur choisit « Ruche 12 » → /hives/12/inspect
+   ▼
+Smart Inspection : entrée → cadre → couvain → reine → réserves
+   │  à chaque étape : 📷 photo  +  🎙️ observation vocale  +  contexte ruche
+   ▼
+AI Analysis : images → ai_observations (prudentes)  ·  voix → observations
+   ▼
+Inspection structurée présentée pour relecture
+   ▼
+Confirmation utilisateur                                   [niveau 2]
+   ▼
+createInspection (offline-safe) → DB / sync queue
+   ▼
+Timeline mise à jour  ·  résumé IA (🟢/🟡/🟠/🔴)  ·  AI Insights recalculés
+   ▼
+Alerte éventuelle : « Programmer une inspection de la ruche 8 ? »  [propose, ne fait pas]</pre>
+      </figure>
+
+      <h4>Flow — question en langage naturel</h4>
+      <p>«&nbsp;Quelles ruches n'ont pas été inspectées depuis 15 jours&nbsp;?&nbsp;» → Intent = lecture → <code>searchApiaryData</code> traduit en filtre sûr → <code>getHives(not_inspected_since=15d)</code> → réponse listée avec dates réelles. Donnée absente → «&nbsp;Je ne possède pas cette information dans vos données.&nbsp;»</p>
+
+      <h4>Flow — inspection hors-ligne puis synchro</h4>
+      <p>Au rucher sans réseau&nbsp;: l'inspection + 4 photos sont écrites dans IndexedDB + <code>sync_queue</code>, visibles immédiatement. De retour&nbsp;: refresh du token → <code>POST /sync/batch</code> ordonné → photos uploadées vers Storage → inspection liée → Timeline serveur à jour → autres appareils notifiés via Realtime.</p>
+
+      <h4>Flow — planificateur de semaine</h4>
+      <p>«&nbsp;Organise mon travail pour cette semaine&nbsp;» → <code>POST /planner/generate</code> agrège tâches en retard, inspections dues, ruches à surveiller, traitements et récoltes prévus, disponibilité → renvoie un <strong>planning proposé</strong>. Aucune tâche importante n'est créée sans confirmation (niveau 2).</p>
+    </section>
+
+    <!-- ============ PARTIE H ============ -->
+    <div class="part-head" id="part-h">
+      <div class="lbl">Partie H</div>
+      <h2>Qualité &amp; livraison</h2>
+    </div>
+
+    <section class="doc" id="s21">
+      <h3><span class="snum">21</span>Stratégie de tests &amp; observabilité</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Périmètre</th><th>Tests</th><th>Outils</th></tr></thead>
+          <tbody>
+            <tr><td>Frontend</td><td>Unitaires (utils, hooks), composants, intégration (features), E2E parcours clés</td><td>Vitest, Testing Library, Playwright</td></tr>
+            <tr><td>Backend</td><td>Unitaires (services), API (routes + schémas), base (repos sur Postgres jetable), auth &amp; RBAC</td><td>Vitest, Supertest, Testcontainers</td></tr>
+            <tr><td>IA</td><td>Function calling (le bon outil, bons paramètres), validation de schéma, <strong>anti-hallucination</strong> (refus si donnée absente), résolution de contexte («&nbsp;elle&nbsp;»), logique de confirmation (niveau 2/3 jamais court-circuité), prudence sanitaire</td><td>Jeux de scénarios + provider IA mocké + évals</td></tr>
+            <tr><td>PWA / offline</td><td>Bascule online/offline, file de synchro, rejeu idempotent, résolution de conflits, non-perte d'inspection</td><td>Playwright (offline), tests de sync dédiés</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h4>Observabilité (§50)</h4>
+      <ul>
+        <li><strong>Logs</strong> structurés (pino), corrélation par <code>request_id</code>, <strong>sans données sensibles</strong>.</li>
+        <li><strong>Erreurs</strong> — Sentry front + back.</li>
+        <li><strong>Métriques</strong> — latence/erreurs API, métriques IA (tokens, coût, taux d'échec d'outil, taux de confirmation refusée), santé de la synchro (âge de la queue, conflits).</li>
+        <li><strong>Perf</strong> — Web Vitals réels ; budgets (§48)&nbsp;: lazy-loading, code splitting, compression d'images, pagination, listes virtualisées, debounce. Cible&nbsp;: fluide avec des centaines de ruches et des milliers d'inspections.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s22">
+      <h3><span class="snum">22</span>Architecture de déploiement</h3>
+      <figure class="wide">
+        <pre class="diagram">                        Utilisateur
+                            │
+                     CDN / HTTPS (edge)
+                            │
+                   Frontend PWA (statique)
+                            │  REST / SSE
+                            ▼
+        ┌──────────────────────────────────────┐
+        │  Backend API (conteneur, ≥2 replicas)│
+        │  + worker jobs (cron, rapports)      │
+        └───────┬─────────────────┬────────────┘
+                │                 │
+        ┌───────▼──────┐   ┌──────▼───────────┐
+        │  Supabase    │   │  Services IA     │
+        │  Postgres    │   │  Gemini (via     │
+        │  Auth        │   │  AIProvider)     │
+        │  Storage S3  │   └──────────────────┘
+        │  Realtime    │
+        └──────────────┘
+
+Environnements : development · staging · production
+CI/CD : lint → tests → build → migrations Prisma → déploiement bleu/vert
+Secrets : gestionnaire dédié par environnement (jamais en repo)
+Sauvegardes : Postgres quotidien + PITR ; test de restauration mensuel
+Monitoring : uptime, alertes latence/erreurs, budget coût IA</pre>
+      </figure>
+      <ul>
+        <li><strong>Frontend</strong> — build statique déployé sur CDN (Vercel/Netlify/Cloudflare Pages), immuable, versionné.</li>
+        <li><strong>Backend</strong> — image Docker unique (API + worker via commande), déployée sur Fly.io/Railway/VPS ; horizontalement scalable car sans état.</li>
+        <li><strong>DB</strong> — Supabase managé au départ&nbsp;; chemin de sortie vers Postgres auto-hébergé documenté (RLS et schéma sont standards).</li>
+        <li><strong>Migrations</strong> — Prisma Migrate en étape CI dédiée, avant le basculement de trafic.</li>
+        <li><strong>Config</strong> — 12-factor&nbsp;: tout par variables d'environnement (voir <a href="#annexe">annexe</a>).</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="s23">
+      <h3><span class="snum">23</span>Roadmap MVP → Production</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Version</th><th>Contenu</th><th>Sortie visée</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="pill l1">V1 · MVP</span></td>
+              <td>Auth · Dashboard · Ruchers · Ruches · Fiche ruche · Inspections + historique · Travaux · Calendrier · PostgreSQL + API · <strong>MOUMEN Assistant textuel</strong> (chat + function calling lecture/écriture de base + Context Engine + confirmations).</td>
+              <td>Fondation utilisable au quotidien.</td>
+            </tr>
+            <tr>
+              <td><span class="pill l2">V2</span></td>
+              <td>Voice AI (Gemini Live) · Caméra · MOUMEN Vision · Smart Inspection · Photos/médias · Reines · Traitements · Récoltes · Finance · Notifications/alertes intelligentes.</td>
+              <td>Copilote voix + vision sur le terrain.</td>
+            </tr>
+            <tr>
+              <td><span class="pill l2">V3</span></td>
+              <td>PWA complète · Offline-first · Synchronisation + résolution de conflits · Rapports PDF/Excel · AI Insights avancés · Météo · GPS/cartes · recherche naturelle avancée.</td>
+              <td>Résilient, hors-ligne, analytique.</td>
+            </tr>
+            <tr>
+              <td><span class="pill l3">V4</span></td>
+              <td>IoT · MQTT · capteurs (température, humidité, poids, acoustique) · Edge AI · moteur prédictif (anomalies, production, risque — toujours «&nbsp;ESTIMATION IA&nbsp;» + niveau de confiance) · multi-utilisateurs / multi-ruchers avancé · collaboration.</td>
+              <td>Écosystème de rucher connecté.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout ok">
+        <p><span class="tag">Prochaine étape</span></p>
+        <p>Après validation de ce document&nbsp;: initialisation du monorepo (<a href="#annexe">annexe</a>), schéma Prisma + migrations Supabase, squelette API Fastify + auth, shell React + design tokens, puis les features V1 dans l'ordre&nbsp;: Auth → Ruchers/Ruches → Fiche ruche → Inspections → Travaux/Calendrier → MOUMEN textuel.</p>
+      </div>
+    </section>
+
+    <!-- ============ ANNEXE ============ -->
+    <div class="part-head" id="annexe">
+      <div class="lbl">Annexe</div>
+      <h2>Structure du monorepo &amp; configuration</h2>
+    </div>
+
+    <section class="doc">
+      <figure>
+        <figcaption>Monorepo (pnpm workspaces)</figcaption>
+        <pre class="code"><span class="c">moumen-apiary-ai/</span>
+├── apps/
+│   ├── web/            <span class="c"># React + Vite + Tailwind (PWA)</span>
+│   └── api/            <span class="c"># Fastify + Prisma (API + worker jobs)</span>
+├── packages/
+│   ├── shared/         <span class="c"># types, schémas Zod, constantes (enums, seuils)</span>
+│   ├── ai-tools/       <span class="c"># définitions d'outils partagées client/serveur</span>
+│   ├── ui/             <span class="c"># design system (tokens + composants)</span>
+│   └── config/         <span class="c"># eslint, tsconfig, tailwind preset</span>
+├── infra/
+│   ├── supabase/       <span class="c"># migrations SQL, policies RLS, seed</span>
+│   └── docker/         <span class="c"># Dockerfile API, compose dev</span>
+├── docs/
+│   └── ARCHITECTURE.html   <span class="c"># ce document</span>
+└── .github/workflows/ <span class="c"># CI : lint · test · build · migrate · deploy</span></pre>
+      </figure>
+      <figure>
+        <figcaption>Variables d'environnement (extrait)</figcaption>
+        <pre class="code"><span class="c"># --- API ---</span>
+DATABASE_URL=postgres://…                <span class="c"># Supabase (pooled)</span>
+DIRECT_URL=postgres://…                  <span class="c"># migrations</span>
+SUPABASE_URL= / SUPABASE_SERVICE_ROLE_KEY=   <span class="c"># serveur uniquement</span>
+SUPABASE_JWT_SECRET=                     <span class="c"># vérif des JWT</span>
+AI_PROVIDER=gemini
+GEMINI_API_KEY=                          <span class="c"># serveur uniquement — jamais dans le bundle web</span>
+STORAGE_BUCKET=apiary-media
+RATE_LIMIT_AI_PER_MIN=20
+SENTRY_DSN=
+
+<span class="c"># --- Web (préfixe VITE_, public) ---</span>
+VITE_API_BASE_URL=https://api.…/api/v1
+VITE_SUPABASE_URL= / VITE_SUPABASE_ANON_KEY=   <span class="c"># clé anon publique (RLS protège)</span>
+VITE_SENTRY_DSN=</pre>
+      </figure>
+      <div class="callout rule">
+        <p><span class="tag">Rappel §61</span></p>
+        <p>À construire réellement — pas de fausse caméra, pas de faux micro, pas de statistiques codées en dur, pas de données fictives permanentes. Une fonction IA n'est annoncée que si elle est réellement connectée à la base et aux services.</p>
+      </div>
+    </section>
+
+    <footer>
+      MOUMEN Apiary AI — Document d'architecture v0.1 · 31 août 2026 · à valider avant implémentation.
+      Les 23 volets suivent l'ordre imposé au §65 du cahier des charges.
+    </footer>
+  </main>
+</div>
+
+<a href="#" class="backtop">↑ Sommaire</a>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    var stored = null;
+    try { stored = localStorage.getItem('moumen-theme'); } catch (e) {}
+    if (stored === 'light' || stored === 'dark') root.setAttribute('data-theme', stored);
+
+    function label() {
+      var t = root.getAttribute('data-theme');
+      btn.textContent = t === 'dark' ? '☾ Sombre' : t === 'light' ? '☀ Clair' : '◐ Auto';
+    }
+    label();
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      var next = cur === 'light' ? 'dark' : cur === 'dark' ? '' : 'light';
+      if (next) root.setAttribute('data-theme', next); else root.removeAttribute('data-theme');
+      try { next ? localStorage.setItem('moumen-theme', next) : localStorage.removeItem('moumen-theme'); } catch (e) {}
+      label();
+    });
+
+    // Scrollspy
+    var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var targets = Object.keys(map).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            var a = map[en.target.id];
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-72px 0px -70% 0px', threshold: 0 });
+      targets.forEach(function (t) { io.observe(t); });
+    }
+  })();
+</script>

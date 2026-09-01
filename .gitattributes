@@ -1,0 +1,7 @@
+# Normalise les fins de ligne en LF dans le dépôt (builds Linux Vercel/Render).
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+pnpm-lock.yaml -diff

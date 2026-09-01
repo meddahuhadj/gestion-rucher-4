@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- Playables SDK -->
+<script>// Playables SDK v1.0.0
+// Game lifecycle bridge: rAF-based game-ready detection + event communication
+(function() {
+  'use strict';
+
+  // Idempotency: skip if already initialized (e.g., server-side injection
+  // followed by client-side inject-javascript via the Bloks webview component).
+  if (window.playablesSDK) return;
+
+  var HANDLER_NAME = 'playablesGameEventHandler';
+  var ANDROID_BRIDGE_NAME = '_MetaPlayablesBridge';
+  var RAF_FRAME_THRESHOLD = 3;
+
+  var gameReadySent = false;
+  var firstInteractionSent = false;
+  var errorSent = false;
+  var frameCount = 0;
+  var originalRAF = window.requestAnimationFrame;
+
+  // --- Transport Layer ---
+
+  function hasIOSBridge() {
+    return !!(window.webkit &&
+              window.webkit.messageHandlers &&
+              window.webkit.messageHandlers[HANDLER_NAME]);
+  }
+
+  function hasAndroidBridge() {
+    return !!(window[ANDROID_BRIDGE_NAME] &&
+              typeof window[ANDROID_BRIDGE_NAME].postEvent === 'function');
+  }
+
+  function isInIframe() {
+    return !!(window.parent && window.parent !== window);
+  }
+
+  function sendEvent(eventName, payload) {
+    var message = {
+      type: eventName,
+      payload: payload || {},
+      timestamp: Date.now()
+    };
+
+    if (hasIOSBridge()) {
+      try {
+        window.webkit.messageHandlers[HANDLER_NAME].postMessage(message);
+      } catch (e) { /* ignore */ }
+      return;
+    }
+
+    if (hasAndroidBridge()) {
+    try {
+      var p = payload || {};
+      p.__secureToken = window.__fbAndroidBridgeAuthToken || '';
+      window[ANDROID_BRIDGE_NAME].postEvent(
+        eventName,
+        JSON.stringify(p)
+      );
+    } catch (e) { /* ignore */ }
+    return;
+  }
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage(message, '*');
+      } catch (e) { /* ignore */ }
+      return;
+    }
+  }
+
+  // --- rAF Game-Ready Detection ---
+
+  function onFrame() {
+    if (gameReadySent) return;
+
+    frameCount++;
+    if (frameCount >= RAF_FRAME_THRESHOLD) {
+      gameReadySent = true;
+      sendEvent('game_ready', {
+        frame_count: frameCount,
+        detected_at: Date.now()
+      });
+      return;
+    }
+
+    originalRAF.call(window, onFrame);
+  }
+
+  if (originalRAF) {
+    window.requestAnimationFrame = function(callback) {
+      if (!gameReadySent) {
+        return originalRAF.call(window, function(timestamp) {
+          frameCount++;
+          if (frameCount >= RAF_FRAME_THRESHOLD && !gameReadySent) {
+            gameReadySent = true;
+            sendEvent('game_ready', {
+              frame_count: frameCount,
+              detected_at: Date.now()
+            });
+          }
+          callback(timestamp);
+        });
+      }
+      return originalRAF.call(window, callback);
+    };
+  }
+
+  // --- First User Interaction Detection ---
+
+  function setupFirstInteractionDetection() {
+    var events = ['touchstart', 'mousedown', 'keydown'];
+
+    function onFirstInteraction() {
+      if (firstInteractionSent) return;
+      firstInteractionSent = true;
+      sendEvent('user_interaction_start', null);
+
+      for (var i = 0; i < events.length; i++) {
+        document.removeEventListener(events[i], onFirstInteraction, true);
+      }
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onFirstInteraction, true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFirstInteractionDetection);
+  } else {
+    setupFirstInteractionDetection();
+  }
+
+  // --- Auto Error Capture ---
+
+  window.addEventListener('error', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    sendEvent('error', {
+      message: event.message || 'Unknown error',
+      source: event.filename || '',
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+      auto_captured: true
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    var reason = event.reason;
+    sendEvent('error', {
+      message: (reason instanceof Error) ? reason.message : String(reason),
+      type: 'unhandled_promise_rejection',
+      auto_captured: true
+    });
+  });
+
+  // --- Public API ---
+
+  window.playablesSDK = {
+    complete: function(score) {
+      sendEvent('game_ended', {
+        score: score,
+        completed: true
+      });
+    },
+
+    error: function(message) {
+      if (errorSent) return;
+      errorSent = true;
+      sendEvent('error', {
+        message: message || 'Unknown error',
+        auto_captured: false
+      });
+    },
+
+    sendEvent: function(eventName, payload) {
+      if (!eventName || typeof eventName !== 'string') return;
+      sendEvent(eventName, payload);
+    }
+  };
+
+  // Kick off rAF detection in case no game code calls rAF immediately
+  if (originalRAF) {
+    originalRAF.call(window, onFrame);
+  }
+})();</script>
+<script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Assistant vocal en temps réel avec Gemini 2.5">
+  <meta name="theme-color" content="#0f172a">
+  <title>HADJ ASSISTANT</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiR2VtaW5pIExpdmUgQXNzaXN0YW50Iiwic2hvcnRfbmFtZSI6IkdlbWluaSBMaXZlIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3JlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyUyMzM3MzBmZicvJTNFJTNDdGV4dCB4PSc1MCUyNScgeT0nNTAlMjUnIGZvbnQtc2l6ZT0nNTAnIGZpbGw9J3doaXRlJyUzRUclM0MvdGV4dCUzRSUzQy9zdmclM0UiLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233730ff'/%3E%3Ctext x='50%25' y='50%25' font-size='50' fill='white'%3EG%3C/text%3E%3C/svg%3E">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+    }
+    
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #475569;
+      transition: all 0.3s;
+    }
+    
+    .status-dot.active {
+      background: #22c55e;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-text {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-family: monospace;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .tools-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .tool-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .tool-card.alarm {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: #475569;
+    }
+    
+    .tool-card.weather {
+      background: rgba(30, 58, 138, 0.4);
+      border-color: #1e40af;
+    }
+    
+    .tool-close {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      color: #64748b;
+      transition: color 0.2s;
+    }
+    
+    .tool-close:hover {
+      color: #ef4444;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+      main {
+        flex-direction: row;
+      }
+    }
+    
+    .video-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 4/3;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 2px solid #334155;
+      background: #020617;
+      transition: all 0.5s;
+    }
+    
+    .video-container.active {
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      text-align: center;
+      padding: 2rem;
+      background: rgba(2, 6, 23, 0.7);
+    }
+    
+    .visualizer {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .visualizer-core {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.5s;
+      position: relative;
+    }
+    
+    .visualizer-core.speaking {
+      background: #a855f7;
+      animation: scale-pulse 0.8s infinite;
+    }
+    
+    .visualizer-core.listening {
+      background: #3b82f6;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
+    
+    @keyframes scale-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    .visualizer svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+    
+    .status-message {
+      min-height: 1.5rem;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .status-message.listening { color: #60a5fa; }
+    .status-message.speaking { color: #a78bfa; }
+    .status-message.connecting { color: #fbbf24; }
+    .status-message.error { color: #f87171; }
+    
+    .transcription-section {
+      width: 100%;
+      max-height: 400px;
+    }
+    
+    @media (min-width: 768px) {
+      .transcription-section {
+        width: 350px;
+        max-height: none;
+      }
+    }
+    
+    .transcription-container {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      border: 1px solid #334155;
+      padding: 1.5rem;
+      height: 100%;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .transcription-empty {
+      color: #64748b;
+      text-align: center;
+      padding: 2rem;
+      font-style: italic;
+    }
+    
+    .transcription-entry {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .transcription-entry.user {
+      align-items: flex-end;
+    }
+    
+    .transcription-label {
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+      padding: 0 0.5rem;
+    }
+    
+    .transcription-bubble {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+    }
+    
+    .transcription-entry.user .transcription-bubble {
+      background: #2563eb;
+      color: white;
+      border-top-right-radius: 0.25rem;
+    }
+    
+    .transcription-entry.agent .transcription-bubble {
+      background: #334155;
+      color: #e2e8f0;
+      border-top-left-radius: 0.25rem;
+    }
+    
+    footer {
+      position: sticky;
+      bottom: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .control-panel {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid #334155;
+      border-radius: 9999px;
+      padding: 0.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    button:active {
+      transform: scale(0.95);
+    }
+    
+    button.start {
+      background: #2563eb;
+      color: white;
+    }
+    
+    button.start:hover {
+      background: #3b82f6;
+    }
+    
+    button.stop {
+      background: #dc2626;
+      color: white;
+    }
+    
+    button.stop:hover {
+      background: #ef4444;
+    }
+    
+    button svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .api-key-prompt {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    
+    .api-key-dialog {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .api-key-dialog h2 {
+      margin-bottom: 1rem;
+      color: #60a5fa;
+    }
+    
+    .api-key-dialog p {
+      margin-bottom: 1.5rem;
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+    
+    .api-key-dialog input {
+      width: 100%;
+      padding: 0.75rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: white;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    
+    .api-key-dialog button {
+      border-radius: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>HADJ ASSISTANT</h1>
+        <p class="subtitle">Voice, vision & outils en temps réel</p>
+      </div>
+      <div class="status-indicator">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">IDLE</span>
+      </div>
+    </header>
+    
+    <div class="tools-display" id="toolsDisplay"></div>
+    
+    <main>
+      <div class="video-section">
+        <div class="video-container" id="videoContainer">
+          <video id="video" autoplay playsinline muted></video>
+          <div class="video-overlay" id="videoOverlay">
+            Cliquez sur "Démarrer" pour commencer
+          </div>
+          <div class="visualizer">
+            <div class="visualizer-core" id="visualizerCore"></div>
+          </div>
+          <canvas id="canvas" style="display:none"></canvas>
+        </div>
+        
+        <div class="status-message" id="statusMessage"></div>
+      </div>
+      
+      <div class="transcription-section">
+        <div class="transcription-container" id="transcriptionContainer">
+          <div class="transcription-empty">
+            La transcription apparaîtra ici...
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <div class="control-panel">
+        <button id="controlBtn" class="start">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span id="btnText">Démarrer l'Assistant</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+  
+  <div class="api-key-prompt" id="apiKeyPrompt" style="display:none">
+    <div class="api-key-dialog">
+      <h2>Clé API Gemini requise</h2>
+      <p>Veuillez entrer votre clé API Gemini pour utiliser l'assistant vocal. Vous pouvez l'obtenir sur <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#60a5fa">Google AI Studio</a>.</p>
+      <input type="password" id="apiKeyInput" placeholder="Entrez votre clé API...">
+      <button onclick="saveApiKey()" class="start">Enregistrer</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { GoogleGenAI } from 'https://esm.sh/@google/genai@^1.34.0';
+    
+    // État de l'application
+    const state = {
+      status: 'IDLE',
+      session: null,
+      mediaStream: null,
+      audioContextIn: null,
+      audioContextOut: null,
+      nextStartTime: 0,
+      activeSources: new Set(),
+      frameInterval: null,
+      currentInputTranscription: '',
+      currentOutputTranscription: '',
+      transcriptions: [],
+      alarms: [],
+      weather: null,
+      apiKey: localStorage.getItem('gemini_api_key')
+    };
+    
+    // Éléments DOM
+    const elements = {
+      statusDot: document.getElementById('statusDot'),
+      statusText: document.getElementById('statusText'),
+      statusMessage: document.getElementById('statusMessage'),
+      video: document.getElementById('video'),
+      canvas: document.getElementById('canvas'),
+      videoContainer: document.getElementById('videoContainer'),
+      videoOverlay: document.getElementById('videoOverlay'),
+      visualizerCore: document.getElementById('visualizerCore'),
+      transcriptionContainer: document.getElementById('transcriptionContainer'),
+      toolsDisplay: document.getElementById('toolsDisplay'),
+      controlBtn: document.getElementById('controlBtn'),
+      btnText: document.getElementById('btnText'),
+      apiKeyPrompt: document.getElementById('apiKeyPrompt'),
+      apiKeyInput: document.getElementById('apiKeyInput')
+    };
+    
+    // Utilitaires audio
+    function encode(bytes) {
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+    
+    function decode(base64) {
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
+    }
+    
+    async function decodeAudioData(data, ctx, sampleRate, numChannels) {
+      const dataInt16 = new Int16Array(data.buffer);
+      const frameCount = dataInt16.length / numChannels;
+      const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+      
+      for (let channel = 0; channel < numChannels; channel++) {
+        const channelData = buffer.getChannelData(channel);
+        for (let i = 0; i < frameCount; i++) {
+          channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+        }
+      }
+      return buffer;
+    }
+    
+    function createPcmBlob(data) {
+      const l = data.length;
+      const int16 = new Int16Array(l);
+      for (let i = 0; i < l; i++) {
+        int16[i] = Math.max(-1, Math.min(1, data[i])) * 32767;
+      }
+      return {
+        data: encode(new Uint8Array(int16.buffer)),
+        mimeType: 'audio/pcm;rate=16000',
+      };
+    }
+    
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result.split(',')[1];
+          resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+    
+    // Mise à jour de l'UI
+    function updateStatus(newStatus) {
+      state.status = newStatus;
+      elements.statusText.textContent = newStatus;
+      elements.statusDot.classList.toggle('active', newStatus !== 'IDLE');
+      
+      elements.statusMessage.className = 'status-message ' + newStatus.toLowerCase();
+      elements.statusMessage.textContent = {
+        'IDLE': '',
+        'CONNECTING': 'Initialisation...',
+        'LISTENING': 'Je vous écoute...',
+        'SPEAKING': 'Gemini parle...',
+        'ERROR': 'Erreur de connexion'
+      }[newStatus] || '';
+      
+      elements.videoContainer.classList.toggle('active', newStatus !== 'IDLE');
+      elements.videoOverlay.style.display = newStatus === 'IDLE' ? 'flex' : 'none';
+      
+      elements.visualizerCore.className = 'visualizer-core';
+      if (newStatus === 'SPEAKING') elements.visualizerCore.classList.add('speaking');
+      if (newStatus === 'LISTENING') elements.visualizerCore.classList.add('listening');
+    }
+    
+    function updateTools() {
+      const html = [];
+      
+      state.alarms.forEach(alarm => {
+        html.push(`
+          <div class="tool-card alarm">
+            <span>🔔</span>
+            <span>${alarm.time}</span>
+            ${alarm.label ? `<span style="color:#94a3b8">(${alarm.label})</span>` : ''}
+            <span class="tool-close" onclick="removeAlarm('${alarm.id}')">×</span>
+          </div>
+        `);
+      });
+      
+      if (state.weather) {
+        html.push(`
+          <div class="tool-card weather">
+            <span>🌤️</span>
+            <span>${state.weather.location}: ${state.weather.temp} - ${state.weather.condition}</span>
+            <span class="tool-close" onclick="removeWeather()">×</span>
+          </div>
+        `);
+      }
+      
+      elements.toolsDisplay.innerHTML = html.join('');
+    }
+    
+    function updateTranscriptions() {
+      if (state.transcriptions.length === 0) {
+        elements.transcriptionContainer.innerHTML = '<div class="transcription-empty">La transcription apparaîtra ici...</div>';
+        return;
+      }
+      
+      const html = state.transcriptions.map(entry => `
+        <div class="transcription-entry ${entry.role}">
+          <div class="transcription-label">${entry.role === 'user' ? 'Vous' : 'Gemini'}</div>
+          <div class="transcription-bubble">${entry.text}</div>
+        </div>
+      `).join('');
+      
+      elements.transcriptionContainer.innerHTML = html;
+      elements.transcriptionContainer.scrollTop = elements.transcriptionContainer.scrollHeight;
+    }
+    
+    // Gestion des outils
+    async function handleFunctionCall(fc) {
+      console.log('Function call:', fc);
+      
+      if (fc.name === 'setAlarm') {
+        const { time, label } = fc.args;
+        const newAlarm = { id: Math.random().toString(36).substr(2, 5), time, label };
+        state.alarms.push(newAlarm);
+        updateTools();
+        return { status: 'success', message: `Alarme réglée pour ${time}${label ? ` (${label})` : ''}` };
+      }
+      
+      if (fc.name === 'getWeather') {
+        const { location } = fc.args;
+        const conditions = ['Ensoleillé', 'Nuageux', 'Pluvieux', 'Venteux'];
+        const temp = Math.floor(Math.random() * 15 + 10) + '°C';
+        const condition = conditions[Math.floor(Math.random() * conditions.length)];
+        
+        state.weather = { location, temp, condition };
+        updateTools();
+        return { status: 'success', location, temperature: temp, condition };
+      }
+      
+      return { error: 'Fonction inconnue' };
+    }
+    
+    window.removeAlarm = (id) => {
+      state.alarms = state.alarms.filter(a => a.id !== id);
+      updateTools();
+    };
+    
+    window.removeWeather = () => {
+      state.weather = null;
+      updateTools();
+    };
+    
+    // Session
+    async function startSession() {
+      if (!state.apiKey) {
+        elements.apiKeyPrompt.style.display = 'flex';
+        return;
+      }
+      
+      try {
+        updateStatus('CONNECTING');
+        
+        state.audioContextIn = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        state.audioContextOut = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        state.nextStartTime = 0;
+        
+        const ai = new GoogleGenAI({ apiKey: state.apiKey });
+        
+        state.mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: { width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        
+        elements.video.srcObject = state.mediaStream;
+        
+        state.session = await ai.live.connect({
+          model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+          callbacks: {
+            onopen: () => {
+              console.log('Session ouverte');
+              updateStatus('LISTENING');
+              
+              // Audio
+              const audioSource = state.audioContextIn.createMediaStreamSource(state.mediaStream);
+              const scriptProcessor = state.audioContextIn.createScriptProcessor(4096, 1, 1);
+              
+              scriptProcessor.onaudioprocess = (e) => {
+                const inputData = e.inputBuffer.getChannelData(0);
+                const pcmBlob = createPcmBlob(inputData);
+                state.session?.sendRealtimeInput({ media: pcmBlob });
+              };
+              
+              audioSource.connect(scriptProcessor);
+              scriptProcessor.connect(state.audioContextIn.destination);
+              
+              // Vidéo
+              state.frameInterval = setInterval(() => {
+                if (elements.video.readyState >= 2) {
+                  const ctx = elements.canvas.getContext('2d');
+                  elements.canvas.width = elements.video.videoWidth;
+                  elements.canvas.height = elements.video.videoHeight;
+                  ctx.drawImage(elements.video, 0, 0);
+                  
+                  elements.canvas.toBlob(async (blob) => {
+                    if (blob) {
+                      const base64 = await blobToBase64(blob);
+                      state.session?.sendRealtimeInput({
+                        media: { data: base64, mimeType: 'image/jpeg' }
+                      });
+                    }
+                  }, 'image/jpeg', 0.6);
+                }
+              }, 1000);
+            },
+            onmessage: async (message) => {
+              // Tool calls
+              if (message.toolCall) {
+                for (const fc of message.toolCall.functionCalls) {
+                  const result = await handleFunctionCall(fc);
+                  state.session?.sendToolResponse({
+                    functionResponses: { id: fc.id, name: fc.name, response: { result } }
+                  });
+                }
+              }
+              
+              // Transcription
+              if (message.serverContent?.outputTranscription) {
+                state.currentOutputTranscription += message.serverContent.outputTranscription.text;
+              }
+              if (message.serverContent?.inputTranscription) {
+                state.currentInputTranscription += message.serverContent.inputTranscription.text;
+              }
+              
+              if (message.serverContent?.turnComplete) {
+                const userText = state.currentInputTranscription.trim();
+                const agentText = state.currentOutputTranscription.trim();
+                
+                if (userText) {
+                  state.transcriptions.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    role: 'user',
+                    text: userText,
+                    timestamp: Date.now()
+                  });
+                }
+                if (agentText) {
+                  state.transcriptions.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    role: 'agent',
+                    text: agentText,
+                    timestamp: Date.now()
+                  });
+                }
+                
+                updateTranscriptions();
+                state.currentInputTranscription = '';
+                state.currentOutputTranscription = '';
+                updateStatus('LISTENING');
+              }
+              
+              // Audio
+              const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+              if (base64Audio) {
+                updateStatus('SPEAKING');
+                const ctx = state.audioContextOut;
+                state.nextStartTime = Math.max(state.nextStartTime, ctx.currentTime);
+                
+                const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
+                const source = ctx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(ctx.destination);
+                source.addEventListener('ended', () => state.activeSources.delete(source));
+                source.start(state.nextStartTime);
+                state.nextStartTime += audioBuffer.duration;
+                state.activeSources.add(source);
+              }
+              
+              if (message.serverContent?.interrupted) {
+                state.activeSources.forEach(s => s.stop());
+                state.activeSources.clear();
+                state.nextStartTime = 0;
+                updateStatus('LISTENING');
+              }
+            },
+            onerror: (e) => {
+              console.error('Erreur:', e);
+              updateStatus('ERROR');
+              stopSession();
+            },
+            onclose: () => {
+              console.log('Session fermée');
+              stopSession();
+            }
+          },
+          config: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } }
+            },
+            systemInstruction: 'Tu es un assistant vocal intelligent et amical avec capacités visuelles. Tu peux voir l\'utilisateur. Tu as des outils pour régler des alarmes et vérifier la météo. Réponds naturellement et garde tes réponses brèves. Si l\'utilisateur demande la météo ou de régler une alarme, utilise les outils fournis.',
+            tools: [{
+              functionDeclarations: [
+                {
+                  name: 'setAlarm',
+                  description: 'Règle une alarme à une heure spécifique.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      time: { type: 'STRING', description: 'L\'heure de l\'alarme (ex: "08:00", "20h")' },
+                      label: { type: 'STRING', description: 'Un label optionnel pour l\'alarme' }
+                    },
+                    required: ['time']
+                  }
+                },
+                {
+                  name: 'getWeather',
+                  description: 'Obtient la météo actuelle pour un lieu.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      location: { type: 'STRING', description: 'La ville et le pays (ex: "Paris, France")' }
+                    },
+                    required: ['location']
+                  }
+                }
+              ]
+            }],
+            inputAudioTranscription: {},
+            outputAudioTranscription: {}
+          }
+        });
+        
+      } catch (err) {
+        console.error('Erreur démarrage:', err);
+        updateStatus('ERROR');
+        alert('Impossible d\'accéder à la caméra/micro ou de se connecter à l\'API');
+      }
+    }
+    
+    async function stopSession() {
+      if (state.frameInterval) {
+        clearInterval(state.frameInterval);
+        state.frameInterval = null;
+      }
+      
+      if (state.session) {
+        state.session.close();
+        state.session = null;
+      }
+      
+      if (state.mediaStream) {
+        state.mediaStream.getTracks().forEach(track => track.stop());
+        state.mediaStream = null;
+      }
+      
+      if (state.audioContextIn) {
+        await state.audioContextIn.close();
+        state.audioContextIn = null;
+      }
+      
+      if (state.audioContextOut) {
+        await state.audioContextOut.close();
+        state.audioContextOut = null;
+      }
+      
+      state.activeSources.forEach(s => s.stop());
+      state.activeSources.clear();
+      
+      updateStatus('IDLE');
+    }
+    
+    // Contrôles
+    elements.controlBtn.addEventListener('click', async () => {
+      if (state.status === 'IDLE' || state.status === 'ERROR') {
+        elements.controlBtn.disabled = true;
+        await startSession();
+        elements.controlBtn.disabled = false;
+        elements.controlBtn.className = 'stop';
+        elements.btnText.textContent = 'Arrêter l\'Assistant';
+        elements.controlBtn.innerHTML = `
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+          </svg>
+          <span>Arrêter l'Assistant</span>
+        `;
+      } else {
+        await stopSession();
+        elements.controlBtn.className = 'start';
+        elements.btnText.textContent = 'Démarrer l\'Assistant';
+        elements.controlBtn.innerHTML = `
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>Démarrer l'Assistant</span>
+        `;
+      }
+    });
+    
+    window.saveApiKey = () => {
+      const key = elements.apiKeyInput.value.trim();
+      if (key) {
+        state.apiKey = key;
+        localStorage.setItem('gemini_api_key', key);
+        elements.apiKeyPrompt.style.display = 'none';
+        startSession();
+      }
+    };
+    
+    // Initialisation
+    updateStatus('IDLE');
+    updateTools();
+    updateTranscriptions();
+    
+    // Service Worker pour PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZSA9PiBzZWxmLnNraXBXYWl0aW5nKCkpOw==');
+    }
+  </script>
+</body>
+</html>

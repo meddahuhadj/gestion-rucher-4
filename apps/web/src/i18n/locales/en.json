@@ -1,0 +1,332 @@
+{
+  "app": { "name": "MOUMEN Apiary AI", "tagline": "The beekeeper's intelligent copilot" },
+  "nav": {
+    "dashboard": "Dashboard",
+    "apiaries": "Apiaries",
+    "hives": "Hives",
+    "inspections": "Inspections",
+    "calendar": "Calendar",
+    "tasks": "Tasks",
+    "queens": "Queens",
+    "treatments": "Treatments",
+    "harvests": "Harvests",
+    "finance": "Finance",
+    "analytics": "Analytics",
+    "moumen": "MOUMEN AI",
+    "reports": "Reports",
+    "settings": "Settings",
+    "home": "Home",
+    "menu": "Menu"
+  },
+  "common": {
+    "loading": "Loading…",
+    "retry": "Retry",
+    "add": "Add",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "search": "Search",
+    "offline": "Offline mode — your data is saved locally.",
+    "syncing": "Syncing… ({{count}} pending)",
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This module is on the roadmap. See docs/ARCHITECTURE.html."
+  },
+  "dashboard": {
+    "greeting": "Hello 👋",
+    "activeHives": "Active hives",
+    "alerts": "Alerts",
+    "inspectionsToday": "Inspections",
+    "tasks": "Tasks",
+    "insightsTitle": "MOUMEN AI Insights",
+    "insightsEmpty": "No alerts — all good.",
+    "upcomingTasks": "Upcoming tasks",
+    "talkToMoumen": "Talk to MOUMEN"
+  },
+  "auth": {
+    "email": "Email address",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "sendMagicLink": "Send me a sign-in link",
+    "useMagicLink": "Use an email link",
+    "usePassword": "Use a password",
+    "google": "Continue with Google",
+    "or": "or",
+    "checkEmail": "Check your email.",
+    "notConfigured": "Auth not configured (VITE_SUPABASE_URL missing).",
+    "devLogin": "Developer sign-in (local)"
+  },
+  "analytics": {
+    "hives": "Hives",
+    "activity": "Activity",
+    "inspections30": "Inspections (30d)",
+    "inspections7": "Inspections (7d)"
+  },
+  "apiaries": {
+    "new": "New apiary",
+    "edit": "Edit",
+    "empty": "No apiaries. Create one to get started.",
+    "name": "Name",
+    "location": "Location",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "notes": "Notes",
+    "delete": "Delete apiary",
+    "deleteConfirm": "Delete \"{{name}}\"? Hives are not deleted and stay available in their history.",
+    "deleteBlocked": "Move or remove this apiary's hives first."
+  },
+  "hives": {
+    "title": "Hives",
+    "empty": "No hives yet.",
+    "new": "New hive",
+    "edit": "Edit",
+    "number": "No.",
+    "name": "Name",
+    "status": "Status",
+    "strength": "Strength",
+    "origin": "Origin",
+    "hiveType": "Hive type",
+    "strain": "Strain",
+    "currentQueen": "Current queen",
+    "noQueen": "— No queen",
+    "needApiary": "Create an apiary first to add hives to it.",
+    "lastInspection": "Last inspection",
+    "never": "never",
+    "filterWeak": "Weak",
+    "filterAll": "All",
+    "emptyArchived": "No archived hives.",
+    "allApiaries": "All apiaries",
+    "filter": { "active": "Active", "weak": "Weak", "archived": "Archived" }
+  },
+  "hiveStatus": {
+    "active": "Active",
+    "strong": "Strong",
+    "medium": "Medium",
+    "weak": "Weak",
+    "very_weak": "Very weak",
+    "dead": "Dead",
+    "sold": "Sold",
+    "merged": "Merged",
+    "archived": "Archived"
+  },
+  "hiveDetail": {
+    "askMoumen": "Ask MOUMEN",
+    "startInspection": "Start inspection",
+    "nextInspection": "Next inspection",
+    "queen": "Queen",
+    "inspections": "Inspections",
+    "noInspections": "No inspection recorded.",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "archiveHint": "The hive moves to \"archived\" status. Its history is kept and nothing is deleted.",
+    "archiveReason": "Reason for archiving (sold, merged, dead…)"
+  },
+  "smart": {
+    "title": "Guided inspection",
+    "back": "Back",
+    "next": "Next",
+    "review": "Review",
+    "reviewTitle": "Check before saving",
+    "addPhoto": "Add a photo",
+    "photos": "Photos",
+    "aiNotes": "AI observations",
+    "disclaimer": "AI observations are cues to verify, not a diagnosis.",
+    "step": {
+      "entrance": { "title": "The hive entrance", "hint": "Show the activity on the landing board." },
+      "frame": { "title": "A frame", "hint": "Pull out and photograph a frame." },
+      "brood": { "title": "The brood area", "hint": "Show open and capped brood." },
+      "queen": { "title": "The queen", "hint": "Look for the queen if visible." },
+      "stores": { "title": "The stores", "hint": "Show stored honey and pollen." }
+    }
+  },
+  "queens": {
+    "old": "Old",
+    "years": "yr",
+    "unknownStrain": "Queen",
+    "unknownYear": "unknown year"
+  },
+  "queenStatus": {
+    "active": "In place",
+    "replaced": "Replaced",
+    "dead": "Dead",
+    "removed": "Removed"
+  },
+  "queenQuality": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
+  },
+  "treatments": { "ongoing": "ongoing" },
+  "treatmentTarget": { "varroa": "Varroa", "nosema": "Nosema", "other": "Other" },
+  "tasks": {
+    "newPlaceholder": "New task…",
+    "empty": "No tasks.",
+    "done": "Mark as done",
+    "scope": { "overdue": "Overdue", "today": "Today", "week": "Week", "all": "All" }
+  },
+  "taskPriority": { "low": "Low", "normal": "Normal", "high": "High", "urgent": "Urgent" },
+  "taskType": {
+    "inspection": "Inspection",
+    "split": "Split",
+    "feeding": "Feeding",
+    "add_frame": "Add frame",
+    "treatment": "Treatment",
+    "queen_check": "Queen check",
+    "queen_replace": "Queen replacement",
+    "harvest": "Harvest",
+    "transfer": "Transfer",
+    "merge": "Merge",
+    "seasonal_prep": "Seasonal prep",
+    "custom": "Task"
+  },
+  "calendar": {
+    "organise": "Plan my week",
+    "createTask": "Create task",
+    "noDate": "No due date"
+  },
+  "inspection": {
+    "quickTitle": "Quick inspection",
+    "queenSeen": "Queen seen",
+    "honey": "Honey stores",
+    "notes": "Observations…",
+    "saved": "Inspection saved.",
+    "savedOffline": "Saved offline — will sync when reconnected."
+  },
+  "strength": {
+    "very_strong": "Very strong",
+    "strong": "Strong",
+    "medium": "Medium",
+    "weak": "Weak",
+    "very_weak": "Very weak"
+  },
+  "level": { "none": "None", "low": "Low", "medium": "Medium", "high": "Good" },
+  "finance": {
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "revenue": "Revenue",
+    "expense": "Expenses",
+    "profit": "Profit",
+    "byCategory": "Expenses by category"
+  },
+  "expenseCategory": {
+    "feed": "Feed",
+    "treatment": "Treatments",
+    "equipment": "Equipment",
+    "hardware": "Hardware",
+    "transport": "Transport",
+    "packaging": "Packaging",
+    "rent": "Rent",
+    "labor": "Labor",
+    "other": "Other"
+  },
+  "harvests": {
+    "total": "Total production",
+    "avgPerHive": "Avg / hive",
+    "count": "Harvests",
+    "bestHive": "Best hive",
+    "recent": "Recent harvests"
+  },
+  "photo": {
+    "label": "Photo",
+    "add": "Add a photo",
+    "replace": "Replace",
+    "remove": "Remove",
+    "failed": "Photo upload failed."
+  },
+  "settings": {
+    "profile": "Profile",
+    "displayName": "Display name",
+    "language": "Language",
+    "currency": "Currency",
+    "units": "Units",
+    "weight": "Weight",
+    "temperature": "Temperature",
+    "weightUnit": { "kg": "Kilograms (kg)", "lb": "Pounds (lb)" },
+    "tempUnit": { "c": "Celsius (°C)", "f": "Fahrenheit (°F)" },
+    "thresholds": "Alert thresholds",
+    "thresholdsHint": "These values drive how dashboard alerts are computed.",
+    "threshold": {
+      "inspectionOverdueDays": "Inspection overdue (days)",
+      "inspectionAttentionDays": "Escalates to \"attention\" (days)",
+      "neverInspectedDays": "Hive never inspected (days)",
+      "queenOldYears": "Queen considered old (years)",
+      "urgentTaskWithinDays": "Urgent task due within (days)"
+    },
+    "saved": "Settings saved."
+  },
+  "reports": {
+    "intro": "Export your data as CSV. Leave the dates empty to include everything.",
+    "from": "From",
+    "to": "To",
+    "separator": "Separator",
+    "sepComma": "Comma (,)",
+    "sepSemicolon": "Semicolon (;) — Excel",
+    "download": "Download",
+    "kind": {
+      "hives": "Hives",
+      "inspections": "Inspections",
+      "harvests": "Harvests",
+      "expenses": "Expenses",
+      "revenues": "Revenues",
+      "tasks": "Tasks",
+      "treatments": "Treatments",
+      "queens": "Queens"
+    }
+  },
+  "moumen": {
+    "title": "MOUMEN Assistant",
+    "placeholder": "Message MOUMEN…",
+    "status": "Service status",
+    "notWired": "Ask MOUMEN a question. It reads your real data and asks for confirmation before any action.",
+    "send": "Send"
+  },
+  "voice": {
+    "start": "Speak",
+    "stop": "Stop",
+    "sensitive": "Sensitive action — confirm",
+    "state": {
+      "idle": "Voice ready",
+      "connecting": "Connecting…",
+      "listening": "Listening…",
+      "speaking": "MOUMEN speaking…",
+      "error": "Voice error"
+    },
+    "err": {
+      "micro": "Microphone access denied.",
+      "connexion": "Voice connection dropped."
+    }
+  },
+  "vision": {
+    "title": "MOUMEN Vision",
+    "disclaimer": "Visual analysis is an observation aid, never a diagnosis.",
+    "openCamera": "Open camera",
+    "capture": "Take photo",
+    "upload": "Upload image",
+    "uploading": "Uploading image…",
+    "analyzing": "Analyzing…",
+    "cameraDenied": "Camera access denied.",
+    "resultTitle": "AI analysis — to verify",
+    "observation": "Observation",
+    "confidence": "Confidence",
+    "interpretation": "Interpretation",
+    "toVerify": "To verify",
+    "recommendation": "Recommendation",
+    "humanCheck": "A human check in the field is still required."
+  },
+  "error": {
+    "unauthorized": "Session expired. Please sign in again.",
+    "forbidden": "You don't have access to this resource.",
+    "not_found": "Resource not found.",
+    "conflict": "Data conflict.",
+    "apiary_has_hives": "This apiary still has hives. Move or archive them first.",
+    "validation_failed": "Invalid data.",
+    "rate_limited": "Too many requests, try again shortly.",
+    "ai_unavailable": "The AI service is temporarily unavailable.",
+    "voice_not_ready": "The voice service is temporarily unavailable.",
+    "internal": "Something went wrong."
+  }
+}

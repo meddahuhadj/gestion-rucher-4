@@ -1,0 +1,21 @@
+{
+  "name": "moumen-apiary-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MOUMEN Apiary AI Web — copilote numérique intelligent pour apiculteur",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:migrate": "pnpm --filter @moumen/api db:migrate",
+    "db:studio": "pnpm --filter @moumen/api db:studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
