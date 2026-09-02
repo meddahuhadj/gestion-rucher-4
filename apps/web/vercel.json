@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://moumen-api.onrender.com/api/:path*"
+      "destination": "https://gestion-rucher-api.onrender.com/api/:path*"
     },
     {
       "source": "/((?!api/|assets/|.*\\.[a-zA-Z0-9]+$).*)",
