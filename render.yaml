@@ -1,28 +1,28 @@
 # ===================================================================
-# Render Blueprint — MOUMEN Apiary AI, tout-en-un (offre gratuite).
+# Render Blueprint — MOUMEN Apiary AI (offre gratuite).
 #
 #   Dashboard Render → New + → Blueprint → choisir le repo → Apply.
-#   Puis renseigner la SEULE variable secrète : GEMINI_API_KEY.
 #
-# Crée 3 ressources dans la même région (frankfurt) :
-#   1. gestion-rucher-db   — PostgreSQL (free, 1 Go, expire ~90 j)
-#   2. gestion-rucher-api  — API Fastify (free web service)
-#   3. gestion-rucher-web  — front React/PWA (static site, gratuit illimité)
+# Crée 2 ressources :
+#   1. gestion-rucher-api  — API Fastify (free web service, région frankfurt)
+#   2. gestion-rucher-web  — front React/PWA (static site, CDN global, gratuit)
+#
+# La base de données est **Supabase Postgres** (pas de Postgres Render : la
+# limite « 1 seule base free par compte » est déjà atteinte, et le free Render
+# expire à 90 j). Les URLs sont à coller dans le dashboard (sync: false).
+#
+# Variables secrètes à saisir dans l'onglet Environment de gestion-rucher-api :
+#   - DATABASE_URL   (Supabase pooler transaction, :6543, + ?pgbouncer=true)
+#   - DIRECT_URL     (Supabase direct, :5432)
+#   - GEMINI_API_KEY (Google AI Studio)
 #
 # Le front appelle /api/* → réécrit vers l'API (same-origin, pas de CORS).
-# Auth : pas de Supabase pour l'instant → bouton « connexion dev » (voir
+# Auth : pas de Supabase Auth pour l'instant → bouton « connexion dev » (voir
 # ALLOW_DEBUG_AUTH + VITE_ALLOW_DEV_LOGIN).
 #
 # ⚠️ Si Render ajoute un suffixe aléatoire à un nom (nom déjà pris), l'URL
 #    du proxy ci-dessous sera fausse : me donner les vraies URLs, je corrige.
 # ===================================================================
-
-databases:
-  - name: gestion-rucher-db
-    plan: free
-    region: frankfurt
-    databaseName: moumen
-    user: moumen
 
 services:
   # ---------------------------------------------------------------
@@ -52,14 +52,15 @@ services:
         value: "20"
       - key: NODE_ENV
         value: production
+      # ── À coller dans le dashboard (onglet Environment) ──
+      # DATABASE_URL = Supabase → Settings → Database → Connection pooling
+      #   (Transaction, :6543), ajouter ?pgbouncer=true à la fin.
       - key: DATABASE_URL
-        fromDatabase:
-          name: gestion-rucher-db
-          property: connectionString
+        sync: false
+      # DIRECT_URL = Supabase → Direct connection (:5432). Utilisé par
+      #   `prisma db push` au démarrage.
       - key: DIRECT_URL
-        fromDatabase:
-          name: gestion-rucher-db
-          property: connectionString
+        sync: false
       # Auth : accepte l'en-tête X-Debug-User (déploiement privé sans Supabase).
       - key: ALLOW_DEBUG_AUTH
         value: "true"
@@ -68,7 +69,6 @@ services:
         value: https://qqnzsttvgbasukbfcgzq.supabase.co
       - key: SUPABASE_JWT_JWKS_URL
         value: https://qqnzsttvgbasukbfcgzq.supabase.co/auth/v1/.well-known/jwks.json
-      # ── SEULE variable à coller dans le dashboard ──
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
