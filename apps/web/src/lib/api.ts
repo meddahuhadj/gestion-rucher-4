@@ -1,7 +1,9 @@
 import type { ApiError } from "@moumen/shared";
 import { useSessionStore } from "@/store/session";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000/api/v1";
+const BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV ? "http://localhost:4000/api/v1" : "/api/v1");
 
 export class ApiRequestError extends Error {
   code: string;
@@ -22,7 +24,8 @@ type Options = Omit<RequestInit, "body"> & { body?: unknown; query?: Record<stri
 
 export async function api<T>(path: string, opts: Options = {}): Promise<T> {
   const { body, query, headers, ...rest } = opts;
-  const url = new URL(BASE + path);
+  // 2e arg : permet une BASE relative ("/api/v1") en prod (proxy same-origin).
+  const url = new URL(BASE + path, window.location.origin);
   if (query) {
     for (const [k, v] of Object.entries(query)) {
       if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
