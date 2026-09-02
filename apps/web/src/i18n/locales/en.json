@@ -282,7 +282,10 @@
     "placeholder": "Message MOUMEN…",
     "status": "Service status",
     "notWired": "Ask MOUMEN a question. It reads your real data and asks for confirmation before any action.",
-    "send": "Send"
+    "send": "Send",
+    "loadingHistory": "Loading conversation…",
+    "executing": "running…",
+    "reconnectFailed": "Unstable connection — please try again."
   },
   "voice": {
     "start": "Speak",

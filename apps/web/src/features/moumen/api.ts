@@ -1,19 +1,24 @@
-import type { ChatDelta, ChatRequest } from "@moumen/shared";
+import type { ChatDelta, ChatRequest, HistoryMessage } from "@moumen/shared";
 import { useSessionStore } from "@/store/session";
 
 const BASE =
   import.meta.env.VITE_API_BASE_URL ||
   (import.meta.env.DEV ? "http://localhost:4000/api/v1" : "/api/v1");
 
+function authHeaders(): Record<string, string> {
+  const { token, debugUser } = useSessionStore.getState();
+  const headers: Record<string, string> = {};
+  if (token) headers.authorization = `Bearer ${token}`;
+  else if (debugUser) headers["x-debug-user"] = debugUser;
+  return headers;
+}
+
 /** Consomme le flux SSE de POST /ai/chat et livre les deltas un à un. */
 export async function* streamChat(
   body: ChatRequest,
   signal?: AbortSignal,
 ): AsyncGenerator<ChatDelta> {
-  const { token, debugUser } = useSessionStore.getState();
-  const headers: Record<string, string> = { "content-type": "application/json" };
-  if (token) headers.authorization = `Bearer ${token}`;
-  else if (debugUser) headers["x-debug-user"] = debugUser;
+  const headers: Record<string, string> = { "content-type": "application/json", ...authHeaders() };
 
   const res = await fetch(`${BASE}/ai/chat`, {
     method: "POST",
@@ -36,6 +41,7 @@ export async function* streamChat(
     const parts = buf.split("\n\n");
     buf = parts.pop() ?? "";
     for (const part of parts) {
+      // ignore les commentaires de heartbeat (lignes commençant par ':')
       const line = part.split("\n").find((l) => l.startsWith("data:"));
       if (!line) continue;
       try {
@@ -47,11 +53,18 @@ export async function* streamChat(
   }
 }
 
+/** Charge l'historique persisté d'une session de conversation. */
+export async function loadHistory(sessionId: string): Promise<HistoryMessage[]> {
+  const headers: Record<string, string> = authHeaders();
+  const params = new URLSearchParams({ sessionId, limit: "30" });
+  const res = await fetch(`${BASE}/ai/history?${params}`, { headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = (await res.json()) as { messages: HistoryMessage[] };
+  return json.messages;
+}
+
 export async function confirmAction(actionToken: string) {
-  const { token, debugUser } = useSessionStore.getState();
-  const headers: Record<string, string> = { "content-type": "application/json" };
-  if (token) headers.authorization = `Bearer ${token}`;
-  else if (debugUser) headers["x-debug-user"] = debugUser;
+  const headers: Record<string, string> = { "content-type": "application/json", ...authHeaders() };
 
   const res = await fetch(`${BASE}/ai/actions/confirm`, {
     method: "POST",

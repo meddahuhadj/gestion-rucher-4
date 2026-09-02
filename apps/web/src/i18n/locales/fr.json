@@ -282,7 +282,10 @@
     "placeholder": "Écrivez à MOUMEN…",
     "status": "État du service",
     "notWired": "Posez une question à MOUMEN. Il consulte vos données réelles et demande confirmation avant toute action.",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "loadingHistory": "Chargement de la conversation…",
+    "executing": "exécution…",
+    "reconnectFailed": "Connexion instable — veuillez réessayer."
   },
   "voice": {
     "start": "Parler",

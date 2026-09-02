@@ -1,10 +1,11 @@
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync, FastifyRequest } from "fastify";
 import { z } from "zod";
 import {
   zChatRequest,
   zConfirmActionRequest,
   zVisionAnalyzeRequest,
   LOCALES,
+  zId,
   type ChatDelta,
 } from "@moumen/shared";
 import { config } from "../../config.js";
@@ -138,6 +139,39 @@ export const aiRoutes: FastifyPluginAsync = async (fastify) => {
     return { sessionId: session.id, saved: body.messages.length };
   });
 
+  // ── historique de conversation (reprise côté client) ──
+  fastify.get("/history", async (req) => {
+    const { sessionId, limit, before } = z
+      .object({
+        sessionId: zId,
+        limit: z.coerce.number().int().min(1).max(50).default(30),
+        before: z.string().datetime().optional(),
+      })
+      .parse(req.query);
+
+    const session = await prisma.conversationSession.findFirst({
+      where: { id: sessionId, ownerId: req.user.dataOwnerId },
+    });
+    if (!session) throw new AppError("not_found", "Session introuvable", { i18nKey: "error.not_found" });
+
+    const messages = await prisma.conversationMessage.findMany({
+      where: { sessionId, ...(before ? { createdAt: { lt: new Date(before) } } : {}) },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+
+    return {
+      session: { id: session.id, startedAt: session.startedAt, locale: session.locale },
+      messages: messages.reverse().map((m) => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        toolName: m.toolName,
+        createdAt: m.createdAt.toISOString(),
+      })),
+    };
+  });
+
   // ── conversation MOUMEN — flux SSE (§8/§12) ──
   fastify.post(
     "/chat",
@@ -172,6 +206,16 @@ export const aiRoutes: FastifyPluginAsync = async (fastify) => {
       const ac = new AbortController();
       req.raw.on("close", () => ac.abort());
 
+      // heartbeat : commentaire SSE périodique pour éviter la fermeture
+      // des connexions par les proxies/load-balancers sur les flux longs.
+      const heartbeat = setInterval(
+        () => {
+          if (!reply.raw.writableEnded) reply.raw.write(": keepalive\n\n");
+        },
+        15000,
+      );
+      const clearHeartbeat = () => clearInterval(heartbeat);
+
       try {
         await runChat(req.user, body, send, ac.signal);
       } catch (err) {
@@ -182,6 +226,7 @@ export const aiRoutes: FastifyPluginAsync = async (fastify) => {
           message: err instanceof AppError ? err.message : "Erreur de l'assistant",
         });
       } finally {
+        clearHeartbeat();
         reply.raw.end();
       }
     },

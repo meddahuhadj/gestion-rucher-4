@@ -52,6 +52,16 @@ export type ChatDelta =
   | { type: "done"; sessionId: string }
   | { type: "error"; code: string; message: string };
 
+/** Un message de conversation persisté (historique). */
+export const zHistoryMessage = z.object({
+  id: z.string(),
+  role: z.enum(["user", "assistant", "tool"]),
+  content: z.string().nullable(),
+  toolName: z.string().nullable().optional(),
+  createdAt: z.string().datetime(),
+});
+export type HistoryMessage = z.infer<typeof zHistoryMessage>;
+
 export const zConfirmActionRequest = z.object({
   actionToken: z.string(),
   confirm: z.literal(true),
