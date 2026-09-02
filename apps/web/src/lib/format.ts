@@ -1,8 +1,12 @@
-import { useSessionStore } from "@/store/session";
+import { useSessionStore, safeLocale } from "@/store/session";
 import { usePrefsStore } from "@/store/prefs";
 
-/** Étiquette de locale pour Intl — l'arabe algérien utilise les chiffres latins. */
-const intlLocale = (l: string) => (l === "ar" ? "ar-DZ" : l);
+/** Étiquette de locale pour Intl — l'arabe algérien utilise les chiffres latins.
+ *  `safeLocale` évite toute valeur invalide ("") → RangeError d'Intl. */
+const intlLocale = (l: string) => {
+  const s = safeLocale(l);
+  return s === "ar" ? "ar-DZ" : s;
+};
 
 export function fmtDate(value: string | Date, opts?: Intl.DateTimeFormatOptions) {
   const l = useSessionStore.getState().locale;

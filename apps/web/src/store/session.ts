@@ -15,7 +15,15 @@ type SessionState = {
   signOut: () => void;
 };
 
-const defaultLocale = (import.meta.env.VITE_DEFAULT_LOCALE as Locale) ?? "fr";
+const SUPPORTED: readonly Locale[] = ["fr", "ar", "en"];
+/** `||` (pas `??`) : une env var vide "" doit aussi retomber sur "fr". */
+const envLocale = (import.meta.env.VITE_DEFAULT_LOCALE || "fr") as Locale;
+const defaultLocale: Locale = SUPPORTED.includes(envLocale) ? envLocale : "fr";
+
+/** Garde-fou : une locale persistée invalide ("" d'une version précédente) ne
+ *  doit jamais atteindre Intl / toLocaleDateString. */
+export const safeLocale = (l: unknown): Locale =>
+  typeof l === "string" && SUPPORTED.includes(l as Locale) ? (l as Locale) : "fr";
 
 export const useSessionStore = create<SessionState>()(
   persist(
@@ -34,6 +42,11 @@ export const useSessionStore = create<SessionState>()(
       name: "moumen.session",
       // le token vient de Supabase (rafraîchi automatiquement) — on ne le persiste pas
       partialize: (s) => ({ locale: s.locale, debugUser: s.debugUser }),
+      // assainit une locale corrompue venue d'un ancien localStorage
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<SessionState>;
+        return { ...current, ...p, locale: safeLocale(p.locale) };
+      },
     },
   ),
 );
