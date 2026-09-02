@@ -93,12 +93,18 @@ services:
     runtime: static
     # (pas de `region` : les static sites Render sont servis par le CDN global.)
     rootDir: .
+    # `corepack pnpm …` (et non `corepack enable && pnpm …`) : l'image de build
+    # des static sites a /usr/bin en lecture seule → `corepack enable` échoue
+    # (EROFS unlink /usr/bin/pnpm). `corepack pnpm` lance pnpm sans créer de shim.
     buildCommand: >-
-      corepack enable &&
-      pnpm install --frozen-lockfile --prod=false &&
-      pnpm --filter @moumen/web build:vercel
+      corepack pnpm install --frozen-lockfile --prod=false &&
+      corepack pnpm --filter @moumen/web build:vercel
     staticPublishPath: apps/web/dist
     autoDeploy: true
+    envVars:
+      # Aligne le front sur la même version que l'API (sinon Node "latest").
+      - key: NODE_VERSION
+        value: "20"
     # 1er match gagnant : /api/* proxifié vers l'API, sinon fallback SPA.
     routes:
       - type: rewrite
