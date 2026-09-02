@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   readonly VITE_SUPABASE_ANON_KEY?: string;
   readonly VITE_DEFAULT_LOCALE?: string;
+  readonly VITE_ALLOW_DEV_LOGIN?: string;
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv;

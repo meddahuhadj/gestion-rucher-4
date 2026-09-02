@@ -87,7 +87,8 @@ export default function LoginPage() {
         {!authConfigured ? (
           <div className="mt-6 space-y-3">
             <p className="text-sm text-attn">{t("auth.notConfigured")}</p>
-            {import.meta.env.DEV && (
+            {(import.meta.env.DEV ||
+              import.meta.env.VITE_ALLOW_DEV_LOGIN === "true") && (
               <button
                 className="btn-ghost w-full"
                 onClick={() => setDebugUser("00000000-0000-0000-0000-000000000001")}

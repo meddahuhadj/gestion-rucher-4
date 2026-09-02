@@ -1,22 +1,50 @@
-# Render Blueprint — API MOUMEN Apiary AI (offre gratuite).
-# Déploiement : https://dashboard.render.com → New + → Blueprint → sélectionner ce repo.
-# La base de données reste Supabase Postgres (NE PAS utiliser le Postgres gratuit
-# de Render : il expire au bout de 90 jours). Voir DEPLOY.md.
+# ===================================================================
+# Render Blueprint — MOUMEN Apiary AI, tout-en-un (offre gratuite).
+#
+#   Dashboard Render → New + → Blueprint → choisir le repo → Apply.
+#   Puis renseigner la SEULE variable secrète : GEMINI_API_KEY.
+#
+# Crée 3 ressources dans la même région (frankfurt) :
+#   1. gestion-rucher-db   — PostgreSQL (free, 1 Go, expire ~90 j)
+#   2. gestion-rucher-api  — API Fastify (free web service)
+#   3. gestion-rucher-web  — front React/PWA (static site, gratuit illimité)
+#
+# Le front appelle /api/* → réécrit vers l'API (same-origin, pas de CORS).
+# Auth : pas de Supabase pour l'instant → bouton « connexion dev » (voir
+# ALLOW_DEBUG_AUTH + VITE_ALLOW_DEV_LOGIN).
+#
+# ⚠️ Si Render ajoute un suffixe aléatoire à un nom (nom déjà pris), l'URL
+#    du proxy ci-dessous sera fausse : me donner les vraies URLs, je corrige.
+# ===================================================================
+
+databases:
+  - name: gestion-rucher-db
+    plan: free
+    region: frankfurt
+    databaseName: moumen
+    user: moumen
 
 services:
+  # ---------------------------------------------------------------
+  # API — Fastify + Prisma
+  # ---------------------------------------------------------------
   - type: web
-    name: moumen-api
+    name: gestion-rucher-api
     runtime: node
     plan: free
-    region: frankfurt # au plus proche de l'Algérie parmi les régions Render
+    region: frankfurt
     rootDir: .
-    # pnpm workspace : on installe depuis la racine puis on build uniquement l'API.
     buildCommand: >-
       corepack enable &&
-      pnpm install --frozen-lockfile &&
+      pnpm install --frozen-lockfile --prod=false &&
       pnpm --filter @moumen/api exec prisma generate &&
       pnpm --filter @moumen/api build
-    startCommand: pnpm --filter @moumen/api start
+    # Au démarrage : synchronise le schéma sur la base (idempotent, no-op si à
+    # jour) puis lance le serveur. `pnpm exec` évite de dépendre du chemin exact
+    # du binaire Prisma dans le store pnpm.
+    startCommand: >-
+      pnpm --filter @moumen/api exec prisma db push --skip-generate &&
+      node apps/api/dist/server.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -24,35 +52,62 @@ services:
         value: "20"
       - key: NODE_ENV
         value: production
-      # Valeurs publiques (projet Supabase gestion-rucher-2) — pré-remplies.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gestion-rucher-db
+          property: connectionString
+      - key: DIRECT_URL
+        fromDatabase:
+          name: gestion-rucher-db
+          property: connectionString
+      # Auth : accepte l'en-tête X-Debug-User (déploiement privé sans Supabase).
+      - key: ALLOW_DEBUG_AUTH
+        value: "true"
+      # Valeurs publiques du projet Supabase (utile si on rebranche l'auth plus tard).
       - key: SUPABASE_URL
         value: https://qqnzsttvgbasukbfcgzq.supabase.co
       - key: SUPABASE_JWT_JWKS_URL
         value: https://qqnzsttvgbasukbfcgzq.supabase.co/auth/v1/.well-known/jwks.json
-      # ── SECRETS : à coller dans le dashboard Render (onglet Environment) ──
-      # DATABASE_URL  = pooler transaction, port 6543 :
-      #   postgresql://postgres.qqnzsttvgbasukbfcgzq:<MDP>@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
-      - key: DATABASE_URL
-        sync: false
-      # DIRECT_URL    = pooler session, port 5432 :
-      #   postgresql://postgres.qqnzsttvgbasukbfcgzq:<MDP>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
-      - key: DIRECT_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY # Project Settings → API → service_role (Reveal)
-        sync: false
-      - key: GEMINI_API_KEY # clé Google AI Studio
+      # ── SEULE variable à coller dans le dashboard ──
+      - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.6-flash
       - key: GEMINI_LIVE_MODEL
         value: gemini-2.5-flash-native-audio-preview-09-2025
-      # Origine(s) autorisée(s) — domaine Vercel du frontend (séparés par des virgules).
       - key: CORS_ORIGINS
-        value: https://moumen-apiary.vercel.app
+        value: https://gestion-rucher-web.onrender.com
       - key: RATE_LIMIT_AI_PER_MIN
         value: "20"
       - key: LOG_LEVEL
         value: info
-      # Optionnel : co-propriété (IDs Supabase séparés par des virgules, Moumen en 1er).
-      - key: TEAM_MEMBER_IDS
-        sync: false
+
+  # ---------------------------------------------------------------
+  # Front — React + Vite + PWA (static)
+  # ---------------------------------------------------------------
+  - type: web
+    name: gestion-rucher-web
+    runtime: static
+    region: frankfurt
+    rootDir: .
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @moumen/web build:vercel
+    staticPublishPath: apps/web/dist
+    autoDeploy: true
+    # 1er match gagnant : /api/* proxifié vers l'API, sinon fallback SPA.
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://gestion-rucher-api.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache

@@ -41,8 +41,8 @@ const envSchema = z.object({
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
 
-  // En dev uniquement : accepte un header X-Debug-User pour simuler un utilisateur
-  // sans passer par Supabase Auth. Ignoré si NODE_ENV=production.
+  // Accepte un header X-Debug-User pour simuler un utilisateur sans passer par
+  // Supabase Auth. Opt-in explicite (déploiement privé) : voir core/auth.ts.
   ALLOW_DEBUG_AUTH: z
     .enum(["true", "false"])
     .default("false")

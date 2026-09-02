@@ -83,9 +83,16 @@ async function ensureUser(u: AuthUser): Promise<void> {
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   fastify.decorateRequest("user", null as unknown as AuthUser);
 
+  if (config.isProd && config.ALLOW_DEBUG_AUTH) {
+    fastify.log.warn(
+      "⚠️  ALLOW_DEBUG_AUTH=true en production — l'en-tête X-Debug-User est accepté. " +
+        "À utiliser uniquement pour un déploiement privé sans Supabase Auth.",
+    );
+  }
+
   fastify.decorate("authenticate", async (req: FastifyRequest) => {
-    // Raccourci de développement — jamais actif en production.
-    if (!config.isProd && config.ALLOW_DEBUG_AUTH) {
+    // Raccourci sans Supabase Auth (déploiement privé). Opt-in via ALLOW_DEBUG_AUTH.
+    if (config.ALLOW_DEBUG_AUTH) {
       const debugId = req.headers["x-debug-user"];
       if (typeof debugId === "string" && debugId.length > 0) {
         const role =
