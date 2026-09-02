@@ -5,7 +5,7 @@
 #
 # Crée 2 ressources :
 #   1. gestion-rucher-api  — API Fastify (free web service, région frankfurt)
-#   2. gestion-rucher-web  — front React/PWA (static site, CDN global, gratuit)
+#   2. moumen-web           — front React/PWA (static site, CDN global, gratuit)
 #
 # La base de données est **Supabase Postgres** (pas de Postgres Render : la
 # limite « 1 seule base free par compte » est déjà atteinte, et le free Render
@@ -79,7 +79,7 @@ services:
       - key: GEMINI_LIVE_MODEL
         value: gemini-2.5-flash-native-audio-preview-09-2025
       - key: CORS_ORIGINS
-        value: https://gestion-rucher-web.onrender.com
+        value: https://moumen-web.onrender.com
       - key: RATE_LIMIT_AI_PER_MIN
         value: "20"
       - key: LOG_LEVEL
@@ -88,8 +88,10 @@ services:
   # ---------------------------------------------------------------
   # Front — React + Vite + PWA (static)
   # ---------------------------------------------------------------
+  # Nom volontairement distinct de "gestion-rucher-*" : un blueprint d'un autre
+  # projet réclame déjà un service "gestion-rucher-web" → collision Render.
   - type: web
-    name: gestion-rucher-web
+    name: moumen-web
     runtime: static
     # (pas de `region` : les static sites Render sont servis par le CDN global.)
     rootDir: .

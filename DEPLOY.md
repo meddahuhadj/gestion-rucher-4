@@ -7,7 +7,7 @@ décrite par `render.yaml` à la racine. Un `Apply` crée les 2 ressources Rende
 | --- | --- | --- |
 | Base de données | **Supabase** (free) | Postgres — pas d'expiration |
 | API (`apps/api`) | Render — `gestion-rucher-api` (web service free) | Fastify + Prisma |
-| Frontend PWA (`apps/web`) | Render — `gestion-rucher-web` (static site, gratuit illimité) | statique + Service Worker |
+| Frontend PWA (`apps/web`) | Render — `moumen-web` (static site, gratuit illimité) | statique + Service Worker |
 
 > Pourquoi pas la base Postgres de Render : la limite « 1 seule base free par
 > compte » est déjà atteinte, et le free Render expire à 90 jours.
@@ -52,7 +52,7 @@ Supabase → **Project Settings → Database → Connection string** :
 
 1. Dashboard Render → **New + → Blueprint** → repo `gestion-rucher-4` →
    branche `main` → **Apply**.
-2. Render crée `gestion-rucher-api` (région `frankfurt`) et `gestion-rucher-web`
+2. Render crée `gestion-rucher-api` (région `frankfurt`) et `moumen-web`
    (static, CDN global).
 3. Renseigner les 3 variables `sync: false`, onglet **Environment** du service
    `gestion-rucher-api` :
@@ -83,7 +83,7 @@ URLs en dur.)
 
 ## 3. Vérification
 
-1. Ouvrir `https://gestion-rucher-web.onrender.com`.
+1. Ouvrir `https://moumen-web.onrender.com`.
 2. Page de connexion → bouton **« connexion dev »**.
 3. 1er appel API ≈ 50 s (cold start du service free, voir §5), puis normal.
 4. `GET https://gestion-rucher-api.onrender.com/health` → `200`.
@@ -131,7 +131,7 @@ La base Supabase est déjà utilisée (§1). Il reste à activer l'authentificat
    `infra/supabase/migrations/0001_rls_and_triggers.sql` puis
    `0002_task_completed_by.sql`.
 4. **Supabase Auth → URL Configuration** : ajouter
-   `https://gestion-rucher-web.onrender.com` en *Site URL* et *Redirect URLs*
+   `https://moumen-web.onrender.com` en *Site URL* et *Redirect URLs*
    (`/**`).
 
 ---
