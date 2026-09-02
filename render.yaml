@@ -88,7 +88,7 @@ services:
   - type: web
     name: gestion-rucher-web
     runtime: static
-    region: frankfurt
+    # (pas de `region` : les static sites Render sont servis par le CDN global.)
     rootDir: .
     buildCommand: >-
       corepack enable &&
