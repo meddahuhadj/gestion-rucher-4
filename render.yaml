@@ -40,11 +40,14 @@ services:
       pnpm --filter @moumen/api exec prisma generate &&
       pnpm --filter @moumen/api build
     # Au démarrage : synchronise le schéma sur la base (idempotent, no-op si à
-    # jour) puis lance le serveur. `pnpm exec` évite de dépendre du chemin exact
-    # du binaire Prisma dans le store pnpm.
+    # jour) puis lance le serveur.
+    # On lance via `tsx` (et non `node`) car @moumen/shared est consommé en
+    # sources .ts (son package.json pointe sur src/index.ts) : `node` échoue avec
+    # ERR_UNKNOWN_FILE_EXTENSION, `tsx` transpile ces .ts à la volée.
+    # `pnpm exec` résout prisma/tsx depuis le store pnpm quel que soit le chemin.
     startCommand: >-
       pnpm --filter @moumen/api exec prisma db push --skip-generate &&
-      node apps/api/dist/server.js
+      pnpm --filter @moumen/api exec tsx dist/server.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
