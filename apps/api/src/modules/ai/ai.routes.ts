@@ -34,18 +34,24 @@ export const aiRoutes: FastifyPluginAsync = async (fastify) => {
     { config: { rateLimit: { max: 10, timeWindow: "1 minute" } } },
     async (req) => {
       const tok = await aiProvider().createRealtimeToken("voice");
-      await writeAudit({
-        actorId: req.user.id,
-        action: "ai.voice.token",
-        entity: "conversation_session",
-        via: "ai",
-      });
-      return {
-        ...tok,
-        apiVersion: "v1alpha",
-        // outils en lecture seule utilisables directement pendant l'échange vocal
-        tools: voiceToolSchemas(),
-      };
+      // L'audit ne doit pas faire échouer l'émission du jeton.
+      try {
+        await writeAudit({
+          actorId: req.user.id,
+          action: "ai.voice.token",
+          entity: "conversation_session",
+          via: "ai",
+        });
+      } catch (err) {
+        req.log.warn({ err }, "writeAudit ai.voice.token a échoué (ignoré)");
+      }
+      let tools: ReturnType<typeof voiceToolSchemas> = [];
+      try {
+        tools = voiceToolSchemas();
+      } catch (err) {
+        req.log.warn({ err }, "voiceToolSchemas a échoué (jeton renvoyé sans outils)");
+      }
+      return { ...tok, apiVersion: "v1alpha", tools };
     },
   );
 

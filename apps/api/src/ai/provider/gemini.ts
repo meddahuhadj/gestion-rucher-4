@@ -257,30 +257,53 @@ export class GeminiProvider implements AIProvider {
     const expireTime = new Date(now + 30 * 60_000).toISOString(); // session ≤ 30 min
     const newSessionExpireTime = new Date(now + 60_000).toISOString(); // connexion sous 1 min
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1alpha/auth_tokens?key=${this.#key}`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          uses: 1,
-          expireTime,
-          newSessionExpireTime,
-          liveConnectConstraints: {
-            model: `models/${model}`,
-            config: { responseModalities: ["AUDIO"] },
-          },
-        }),
-      },
-    );
-    if (!res.ok) {
-      const detail = await res.text().catch(() => "");
-      throw new AppError("ai_unavailable", `Émission du jeton voix impossible (${res.status})`, {
+    let res: Response;
+    try {
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1alpha/auth_tokens?key=${this.#key}`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            uses: 1,
+            expireTime,
+            newSessionExpireTime,
+            liveConnectConstraints: {
+              model: `models/${model}`,
+              config: { responseModalities: ["AUDIO"] },
+            },
+          }),
+        },
+      );
+    } catch (err) {
+      throw new AppError("ai_unavailable", "Appel auth_tokens échoué (réseau)", {
         i18nKey: "error.voice_not_ready",
-        details: detail.slice(0, 300),
+        details: err instanceof Error ? err.message : String(err),
       });
     }
-    const data = (await res.json()) as { name: string };
+
+    const raw = await res.text().catch(() => "");
+    if (!res.ok) {
+      throw new AppError("ai_unavailable", `Émission du jeton voix impossible (${res.status})`, {
+        i18nKey: "error.voice_not_ready",
+        details: raw.slice(0, 500),
+      });
+    }
+    let data: { name?: string };
+    try {
+      data = JSON.parse(raw) as { name?: string };
+    } catch {
+      throw new AppError("ai_unavailable", "Réponse auth_tokens non-JSON", {
+        i18nKey: "error.voice_not_ready",
+        details: raw.slice(0, 500),
+      });
+    }
+    if (!data.name) {
+      throw new AppError("ai_unavailable", "auth_tokens sans champ `name`", {
+        i18nKey: "error.voice_not_ready",
+        details: raw.slice(0, 500),
+      });
+    }
     return { token: data.name, expiresAt: expireTime, model };
   }
 }
